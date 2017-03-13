@@ -107,31 +107,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	
     	//Load phrases library
 		loadPhrases();
-		
-		//Initialize the output files
-		String s1 = "";
-		Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-ddMM-HHmmss");
-        System.out.println( sdf.format(cal.getTime()) );
-		s1 = sdf.format(cal.getTime())+".sd";
-		try
-		{
-			sd1File = new BufferedWriter(new FileWriter(s1));
-		} catch (IOException e)
-		{
-			System.out.println("I/O error: can't open sd1/sd2 data files");
-			System.exit(0);
-		}
-
-		try
-		{
-			sd1File.write("");
-			sd1File.flush();
-		} catch (IOException e)
-		{
-			System.err.println("ERROR WRITING TO DATA FILE!\n" + e);
-			System.exit(1);
-		}
 
 		//Initialize components
 		text1 = new JTextField(70);
@@ -331,6 +306,34 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 //			  }
 //			}, 10*1000);
     }
+    
+    public void initilizeOutput() {
+		
+		//Initialize the output files
+		String s1 = "";
+		Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-ddMM-HHmmss");
+        System.out.println( sdf.format(cal.getTime()) );
+		s1 = sdf.format(cal.getTime())+".sd";
+		try
+		{
+			sd1File = new BufferedWriter(new FileWriter(s1));
+		} catch (IOException e)
+		{
+			System.out.println("I/O error: can't open sd1/sd2 data files");
+			System.exit(0);
+		}
+
+		try
+		{
+			sd1File.write("");
+			sd1File.flush();
+		} catch (IOException e)
+		{
+			System.err.println("ERROR WRITING TO DATA FILE!\n" + e);
+			System.exit(1);
+		}
+    }
 
 	@Override
 	public void actionPerformed(ActionEvent action) {
@@ -347,6 +350,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		
 		
 		if (s.equals("Enter")){
+			initilizeOutput();
 			//TODO Finish current input and write the log
 			//Stop logging the eyegaze data if the eye tracker is started
 			String s2 = text2.getText().toLowerCase();
