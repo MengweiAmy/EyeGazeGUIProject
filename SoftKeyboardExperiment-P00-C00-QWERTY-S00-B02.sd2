@@ -1,0 +1,2 @@
+App,Participant,Condition,Keyboard,Session,Block,Keystrokes,Characters,Time,MSD,Speed_(wpm),Error_rate_(%),KSPC
+SoftKeyboardExperiment,P00,C00,QWERTY,S00,B02,1,0,0.765000,24,0.000000,NaN,Infinity

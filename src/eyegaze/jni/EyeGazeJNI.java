@@ -1,4 +1,4 @@
-import data.EyeGazeData;
+package eyegaze.jni;
 
 public class EyeGazeJNI {
 	
@@ -17,7 +17,7 @@ public class EyeGazeJNI {
 	   
 	   //Get the eye gaze data from the buffer
 	   //TODO
-	   public native EyeGazeData getEyeGazeData();
+	   public native EyeGazeData[] getEyeGazeData();
 	   
 	   //Start to log the gaze data
 	   public native int EyeGazeLogStart();

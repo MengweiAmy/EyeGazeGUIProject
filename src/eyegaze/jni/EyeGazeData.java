@@ -1,4 +1,4 @@
-package data;
+package eyegaze.jni;
 
 public class EyeGazeData {
 	
