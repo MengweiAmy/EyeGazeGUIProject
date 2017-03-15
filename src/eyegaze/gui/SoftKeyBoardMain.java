@@ -36,6 +36,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+import eyegaze.device.EyeDeviceControl;
 import eyegaze.gui.model.KeyBt;
 import eyegaze.gui.model.Sample;
 
@@ -66,11 +67,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	private Vector<Sample> samples= new Vector<Sample>();;
 	
-	private long t1, t2;
+	private long t1, t2 , t3;
 	private int count; // count keystrokes per phrase
 	private Random r = new Random();//generate random index to display random sentence from phrase file
-	
-	//static EyeGazeJNI eyeGaze = new EyeGazeJNI();
 	
 	private String controlType;
 	
@@ -79,6 +78,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	}
 
     public void createAndShowGUI() {
+    	
+    	//Start initial device and calibrate process
+    	EyeDeviceControl.getInstance().initializeDevice();
+    	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
 	    JPanel p1 = createTextField();
@@ -92,8 +95,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                         "Exit Confirmation", JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE, null, null, null);
                 if (confirm == JOptionPane.YES_OPTION) {
-//                    eyeGaze.EyeGazeLogStop();
-//                    eyeGaze.EyeGazeShutDown();
+                	EyeDeviceControl.getInstance().stopLogging();
+                	EyeDeviceControl.getInstance().shutdonwDevice();
                     System.exit(0);
                 }
             }
@@ -228,91 +231,13 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	}
     	return "";
     }
-
-    public static void main(String[] args) {
-        //Schedule a job for the event-dispatching thread:
-        //creating and showing this application's GUI.
-//		int result = eyeGaze.EyeGazeInit(0);
-//		System.out.print("start device....." + result +"\n'");
-//		  
-//		System.out.print("start calibrating device.....\n");
-//		eyeGaze.Calibrate();
-//		
-//        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-//            public void run() {
-//            	SoftKeyBoardMain soft = new SoftKeyBoardMain();
-//            	soft.createAndShowGUI();
-//            	
-//            	//String value = soft.getKeyByPosition(360,200);
-//            	//System.out.println(value);
-//            }
-//        });
-//        
-//		int startSta = eyeGaze.EyeGazeLogStart();
-//		if(startSta == 0) {
-//			System.out.print("start logging data in trace.dat file.....\n");
-//		}else {
-//			System.out.print("start logging failed.....\n");
-//		}
-		
-//        new Thread() {
-//        	public void run() {
-//        		Runnable helloRunnable = new Runnable() {
-//        		    public void run() {
-//        		        System.out.println("Hello world");
-//        		        EyeGazeData[] data = eyeGaze.getEyeGazeData();
-//                		if(data != null) {
-//                			for(int i=0;i<data.length;i++) {
-//                    			int count = data[i].getAppMarkCount();
-//                    			System.out.println("data collected....." + count);
-//                    			System.out.println("data getiIGaze....." + data[i].getiIGaze());
-//                    			System.out.println("data getfXEyeballOffsetMm....." + data[i].getfXEyeballOffsetMm());
-//                    			System.out.println("data getiJGaze....." + data[i].getiJGaze());
-//                    			System.out.println("data getCameraFieldCount....." + data[i].getCameraFieldCount());
-//                			}
-//                		}else {
-//                			System.out.println("no data collected.....");
-//                		}
-//        		    }
-//        		};
-//
-//        		ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-//        		executor.scheduleAtFixedRate(helloRunnable, 0, 300, TimeUnit.MILLISECONDS);
-//        	}
-//        }.start();
-		
-//	    EyeGazeData[] data = eyeGaze.getEyeGazeData();
-// 		if(data != null) {
-// 			System.out.println("data is not null.....");
-// 			for(int i=0;i<data.length;i++) {
-//     			int count = data[i].getAppMarkCount();
-//     			System.out.println("data collected....." + count);
-//     			System.out.println("data getiIGaze....." + data[i].getiIGaze());
-//     			System.out.println("data getfXEyeballOffsetMm....." + data[i].getfXEyeballOffsetMm());
-//     			System.out.println("data getiJGaze....." + data[i].getiJGaze());
-//     			System.out.println("data getCameraFieldCount....." + data[i].getCameraFieldCount());
-// 			}
-// 		}else {
-// 			System.out.println("no data collected.....");
-// 		}
-//		  
-//		Timer timer = new Timer();
-//		  timer.schedule(new TimerTask() {
-//			  @Override
-//			  public void run() {
-//			    // Your database code here
-//				  eyeGaze.EyeGazeLogStop();
-//				  eyeGaze.EyeGazeShutDown();
-//			  }
-//			}, 10*1000);
-    }
     
     public void initilizeOutput() {
 		
 		//Initialize the output files
 		String s1 = "";
 		Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-ddMM-HHmmss");
+        SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy-" + controlType);
         System.out.println( sdf.format(cal.getTime()) );
 		s1 = sdf.format(cal.getTime())+".sd";
 		try
@@ -342,11 +267,18 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		String s = jb.getText();
 		char c = (s.toLowerCase()).charAt(0);
 		
+		int x = jb.getX();
+		int y = jb.getY();
+		
 		++count;
 		if (t1 == 0)
 			t1 = System.currentTimeMillis();
 		t2 = System.currentTimeMillis() - t1;
-		samples.addElement(new Sample(t2, s.toLowerCase()));
+		t3 = System.currentTimeMillis() - EyeDeviceControl.getInstance().getDeviceInitTime();
+		Sample newSam = new Sample(t2, (float)(t3/1000.0), s.toLowerCase());
+		newSam.setXPos(x);
+		newSam.setYPos(y);
+		samples.addElement(newSam);
 		
 		
 		if (s.equals("Enter")){
@@ -404,7 +336,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 				text2.requestFocus(); // so I-beam (caret) does not disappear
 			}
 		}else if(s.equals("Setting")) {
-			
+			//TODO
+		}else if(s.equals("Shift")) {
+			//TODO
 		}
 		else
 		// just a keystroke; add to transcribed text

@@ -24,5 +24,7 @@ public class EyeGazeJNI {
 	   
 	   //Stop to log the gaze data, the file won't close unless the close() function is called
 	   public native int EyeGazeLogStop();
+	   
+	   public native FixtionData VerifyFixtion(EyeGazeData data);
 
 }
