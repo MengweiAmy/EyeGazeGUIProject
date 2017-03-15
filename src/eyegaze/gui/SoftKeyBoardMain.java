@@ -71,6 +71,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private int count; // count keystrokes per phrase
 	private Random r = new Random();//generate random index to display random sentence from phrase file
 	
+	private boolean isLogstared;
+	private boolean isDeviceStarted = false;
 	private String controlType;
 	
 	public SoftKeyBoardMain(String controlType) {
@@ -81,6 +83,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	
     	//Start initial device and calibrate process
     	EyeDeviceControl.getInstance().initializeDevice();
+    	isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
@@ -95,8 +98,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                         "Exit Confirmation", JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE, null, null, null);
                 if (confirm == JOptionPane.YES_OPTION) {
-                	EyeDeviceControl.getInstance().stopLogging();
-                	EyeDeviceControl.getInstance().shutdonwDevice();
+                	if(isDeviceStarted) {
+                    	EyeDeviceControl.getInstance().stopLogging();
+                    	EyeDeviceControl.getInstance().shutdonwDevice();
+                	}
                     System.exit(0);
                 }
             }
@@ -263,6 +268,12 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent action) {
 		// TODO Auto-generated method stub
+		
+		if(!isLogstared) {
+			EyeDeviceControl.getInstance().startLogging();
+			isLogstared = true;
+		}
+		
 		JButton jb = (JButton)action.getSource();
 		String s = jb.getText();
 		char c = (s.toLowerCase()).charAt(0);
@@ -274,13 +285,16 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		if (t1 == 0)
 			t1 = System.currentTimeMillis();
 		t2 = System.currentTimeMillis() - t1;
+		
+		/*
+		 * Calculate the click time based on the device init time(sec)
+		 */
 		t3 = System.currentTimeMillis() - EyeDeviceControl.getInstance().getDeviceInitTime();
 		Sample newSam = new Sample(t2, (float)(t3/1000.0), s.toLowerCase());
 		newSam.setXPos(x);
 		newSam.setYPos(y);
 		samples.addElement(newSam);
-		
-		
+
 		if (s.equals("Enter")){
 			initilizeOutput();
 			//TODO Finish current input and write the log

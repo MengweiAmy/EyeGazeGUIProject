@@ -2,7 +2,7 @@ package eyegaze.jni;
 
 public class EyeGazeData {
 	
-	private boolean gazeVectorFound;
+	private int gazeVectorFound;
 	
 	private int iIGaze;
 	
@@ -30,11 +30,11 @@ public class EyeGazeData {
 	
 	private double reportTimeSec;
 
-	public boolean isGazeVectorFound() {
+	public int isGazeVectorFound() {
 		return gazeVectorFound;
 	}
 
-	public void setGazeVectorFound(boolean gazeVectorFound) {
+	public void setGazeVectorFound(int gazeVectorFound) {
 		this.gazeVectorFound = gazeVectorFound;
 	}
 

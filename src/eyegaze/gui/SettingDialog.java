@@ -9,7 +9,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -92,13 +91,8 @@ public class SettingDialog extends JFrame implements ActionListener{
 			            	dispose();//clost current setting window and open a new keyboard one
 			            	SoftKeyBoardMain soft = new SoftKeyBoardMain(selectedBook);
 			            	soft.createAndShowGUI();
-			            	
-			            	//String value = soft.getKeyByPosition(360,200);
-			            	//System.out.println(value);
 			            }
 			        });
-//			        SoftKeyBoardMain keyboard = new SoftKeyBoardMain(controlType);
-//			        keyboard.createAndShowGUI();
 			    }
 			});
 		 
