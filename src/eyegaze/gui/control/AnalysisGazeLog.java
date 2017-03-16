@@ -94,7 +94,7 @@ public class AnalysisGazeLog {
 	}
 	
 	/**
-	 * Return the analysed eye gaze data
+	 * Return the analyzed eye gaze data
 	 * @return
 	 */
 	public List<EyeGazeData> getEyeGazeData() {
