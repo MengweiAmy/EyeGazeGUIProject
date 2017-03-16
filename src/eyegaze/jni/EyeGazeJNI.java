@@ -2,6 +2,15 @@ package eyegaze.jni;
 
 public class EyeGazeJNI {
 	
+	 private static EyeGazeJNI jni;
+	 
+	 public static EyeGazeJNI getInstance() {
+		if(jni == null) {
+			jni = new EyeGazeJNI();
+		}
+		return jni;
+	 }
+	
 	 static {
 	      System.loadLibrary("EyeGazeControlJNI"); // Load native library at runtime
 	   }
@@ -25,6 +34,7 @@ public class EyeGazeJNI {
 	   //Stop to log the gaze data, the file won't close unless the close() function is called
 	   public native int EyeGazeLogStop();
 	   
-	   public native FixtionData VerifyFixtion(EyeGazeData data);
+	   //Analysis the fixation data based on existed log
+	   public native int VerifyFixation(EyeGazeData[] gazeDatalist);
 
 }

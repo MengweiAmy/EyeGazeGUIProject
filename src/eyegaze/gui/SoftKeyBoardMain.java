@@ -37,6 +37,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import eyegaze.device.EyeDeviceControl;
+import eyegaze.gui.control.AnalysisGazeLog;
+import eyegaze.gui.control.MouseControlService;
 import eyegaze.gui.model.KeyBt;
 import eyegaze.gui.model.Sample;
 
@@ -54,6 +56,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private Color FOREGROUND = new Color(11, 11, 109);
 	
 	KeyBt[] keyboardSet;
+	
+	private JPanel p1;
 	JButton[] jbtnList;
 	
 	private JTextField text1;
@@ -87,7 +91,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
-	    JPanel p1 = createTextField();
+	    p1 = createTextField();
 	    this.setContentPane(p1);
 	    WindowListener exitListener = new WindowAdapter() {
 
@@ -102,7 +106,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                     	EyeDeviceControl.getInstance().stopLogging();
                     	EyeDeviceControl.getInstance().shutdonwDevice();
                 	}
-                    System.exit(0);
+                	MouseControlService service = new MouseControlService();
+        			service.verifyFixtionData(AnalysisGazeLog.getInstance().getEyeGazeData());
+                	System.exit(0);
                 }
             }
         };
@@ -242,9 +248,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		//Initialize the output files
 		String s1 = "";
 		Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy-" + controlType);
+        SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy");
         System.out.println( sdf.format(cal.getTime()) );
-		s1 = sdf.format(cal.getTime())+".sd";
+		s1 = sdf.format(cal.getTime())+"-"+controlType+".sd";
 		try
 		{
 			sd1File = new BufferedWriter(new FileWriter(s1));
@@ -269,7 +275,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent action) {
 		// TODO Auto-generated method stub
 		
-		if(!isLogstared) {
+		if(!isLogstared && isDeviceStarted) {
 			EyeDeviceControl.getInstance().startLogging();
 			isLogstared = true;
 		}
@@ -278,8 +284,11 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		String s = jb.getText();
 		char c = (s.toLowerCase()).charAt(0);
 		
+		
 		int x = jb.getX();
-		int y = jb.getY();
+		//Add the offset of jPanel. The raw Y axis is the position based on keyboard panel
+		//Should add the height of text area, then it is the real position of the button
+		int y = jb.getY()+p1.getComponent(1).getY();
 		
 		++count;
 		if (t1 == 0)
@@ -340,7 +349,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 			text2.setText(targetPhrase);
 			t1 = 0;
 			count = 0;
-
 		}else if (s.equals("Bksp"))
 		{
 			if (targetPhrase.length() >= 1)
@@ -362,6 +370,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 			text2.requestFocus(); // so I-beam (caret) does not disappear
 		}
 		
+	}
+	
+	public JPanel getMainPanel() {
+		return p1;
 	}
     
 }

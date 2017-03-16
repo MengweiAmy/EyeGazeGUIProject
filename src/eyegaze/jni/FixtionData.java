@@ -17,6 +17,8 @@ public class FixtionData {
 	private int iSaccadeDurationDelayed;
 	
 	private int iFixDurationDelayed;
+	
+	private int iFixtionIndex;
 
 	public int getGazePointFoundDelayed() {
 		return gazePointFoundDelayed;
@@ -81,6 +83,13 @@ public class FixtionData {
 	public void setiFixDurationDelayed(int iFixDurationDelayed) {
 		this.iFixDurationDelayed = iFixDurationDelayed;
 	}
-	
+
+	public int getiFixtionIndex() {
+		return iFixtionIndex;
+	}
+
+	public void setiFixtionIndex(int iFixtionIndex) {
+		this.iFixtionIndex = iFixtionIndex;
+	}	
 	
 }

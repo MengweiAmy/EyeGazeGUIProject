@@ -20,7 +20,7 @@ public class EyeGazeData {
 	
 	private float fLengExtOffsetMm;
 	
-	private long cameraFieldCount;
+	private int cameraFieldCount;
 	
 	private double gazeTimeSec;
 	
@@ -102,11 +102,11 @@ public class EyeGazeData {
 		this.fLengExtOffsetMm = fLengExtOffsetMm;
 	}
 
-	public long getCameraFieldCount() {
+	public int getCameraFieldCount() {
 		return cameraFieldCount;
 	}
 
-	public void setCameraFieldCount(long cameraFieldCount) {
+	public void setCameraFieldCount(int cameraFieldCount) {
 		this.cameraFieldCount = cameraFieldCount;
 	}
 

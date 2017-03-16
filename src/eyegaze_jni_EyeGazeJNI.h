@@ -55,6 +55,14 @@ JNIEXPORT jint JNICALL Java_eyegaze_jni_EyeGazeJNI_EyeGazeLogStart
 JNIEXPORT jint JNICALL Java_eyegaze_jni_EyeGazeJNI_EyeGazeLogStop
   (JNIEnv *, jobject);
 
+/*
+ * Class:     eyegaze_jni_EyeGazeJNI
+ * Method:    VerifyFixation
+ * Signature: ([Leyegaze/jni/EyeGazeData;)I
+ */
+JNIEXPORT jint JNICALL Java_eyegaze_jni_EyeGazeJNI_VerifyFixation
+  (JNIEnv *, jobject, jobjectArray);
+
 #ifdef __cplusplus
 }
 #endif
