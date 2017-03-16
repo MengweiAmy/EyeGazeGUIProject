@@ -230,10 +230,11 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     
     //Based on the x,y axis to analyse current button
     public String getKeyByPosition(int x, int y) {
+    	int realY = y- p1.getComponent(1).getY();
     	for(int i=0;i<keyboardSet.length;i++) {
     		KeyBt key = keyboardSet[i];
     		if(key.getX() < x && x < key.getX() + key.getW()) {
-    			if(key.getY() < y && y < key.getY() + key.getH()) {
+    			if(key.getY() < realY && realY < key.getY() + key.getH()) {
     				System.out.println("jbtn"+jbtnList[i].getText());
     				jbtnList[i].doClick();
     				return key.getLabel();
@@ -283,7 +284,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		JButton jb = (JButton)action.getSource();
 		String s = jb.getText();
 		char c = (s.toLowerCase()).charAt(0);
-		
+		System.out.println(s+" is clicked");
 		
 		int x = jb.getX();
 		//Add the offset of jPanel. The raw Y axis is the position based on keyboard panel

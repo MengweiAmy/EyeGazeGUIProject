@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eyegaze.jni.EyeGazeData;
+import eyegaze.jni.FixtionData;
 
 public class AnalysisGazeLog {
 
@@ -21,11 +22,19 @@ public class AnalysisGazeLog {
 	}
 
 	List<EyeGazeData> data = new ArrayList<EyeGazeData>();
-
-	boolean isStartAnalysi = false;
 	
+	List<FixtionData> fixationDatas = new ArrayList<FixtionData>();
+
+	boolean isRawAnaStarted = false;
+	
+	boolean isFixationAnaStarted = false;
+	
+	boolean isFixaRealData = false;
 	int count =0;
 
+	/**
+	 * ************************Analyze Raw gaze point data***************************************
+	 */
 	private void loadFile() {
 		try {
 			FileReader file = new FileReader(new File("trace.dat"));
@@ -55,10 +64,10 @@ public class AnalysisGazeLog {
 			if (temp != "" && temp.length() > 0) {
 				String[] valus = temp.split(" ");
 				if (valus != null && valus.length > 0) {
-					if (valus[0].equals("0") && !isStartAnalysi) {
-						isStartAnalysi = true;
+					if (valus[0].equals("0") && !isRawAnaStarted) {
+						isRawAnaStarted = true;
 					}
-					if (isStartAnalysi) {
+					if (isRawAnaStarted) {
 						if(count == 0) {
 							addNewGazeData(valus);
 							System.out.println(out);
@@ -100,6 +109,63 @@ public class AnalysisGazeLog {
 	public List<EyeGazeData> getEyeGazeData() {
 		loadFile();
 		return data;
+	}
+	
+	/**
+	 * ************************Analyze Fixation data***************************************
+	 */
+	
+	public void loadFixationFile() {
+		try {
+			FileReader file = new FileReader(new File("fixation.dat"));
+			BufferedReader br = new BufferedReader(file);
+			String temp = br.readLine();
+			while (temp != null) {
+				temp = br.readLine();
+				analysisFixationData(temp);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void analysisFixationData(String temp) {
+		String out = temp;
+		if (temp != null) {
+			temp = temp.replaceAll("\\s{2,}", " ").trim();
+			if (temp != "" && temp.length() > 0) {
+				String[] valus = temp.split(" ");
+				if (valus != null && valus.length > 0) {
+					if(valus[0].equals("fix") && !isFixationAnaStarted) {
+						isFixationAnaStarted = true;
+					}
+					if(isFixationAnaStarted && valus[0].equals("0")) {
+						isFixaRealData = true;
+					}
+					if(isFixationAnaStarted && isFixaRealData) {
+						System.out.println(out);
+						FixtionData fix = new FixtionData();
+						fix.setiFixtionIndex(Integer.valueOf(valus[0]));
+						fix.setxFixDelayed(Float.valueOf(valus[1]));
+						fix.setyFixDelayed(Float.valueOf(valus[2]));
+						fix.setiSaccadeDurationDelayed(Integer.valueOf(valus[3]));
+						fix.setiFixDurationDelayed(Integer.valueOf(valus[4]));
+						fix.setGazeDeviationDelayed(Float.valueOf(valus[5]));
+						fixationDatas.add(fix);
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Return the analyzed eye gaze data
+	 * @return
+	 */
+	public List<FixtionData> getFixationData() {
+		loadFixationFile();
+		return fixationDatas;
 	}
 
 }
