@@ -19,6 +19,13 @@ import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+/**
+ * Application entry to choose the control type : 
+ * 		Mouse control
+ * 		Gaze control
+ * @author EYEGAZE 2.3 i7
+ *
+ */
 public class SettingDialog extends JFrame implements ActionListener{
 	
 	private JFrame frame;
@@ -79,17 +86,23 @@ public class SettingDialog extends JFrame implements ActionListener{
 		 b.addActionListener(new ActionListener() {
 			    @Override
 			    public void actionPerformed(ActionEvent event) {
-			        String selectedBook = (String) controlTypeCombo.getSelectedItem();
-			        if (selectedBook.equals("Mouse Controll")) {
+			        String controlTye = (String) controlTypeCombo.getSelectedItem();
+			        if (controlTye.equals("Mouse Controll")) {
 			        	controlType = 0;
-			        } else if (selectedBook.equals("Gaze Control")) {
-			            System.out.println("Nice pick, too!");
+			        } else if (controlTye.equals("Gaze Control")) {
 			            controlType = 1;
 			        }
 			        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			            public void run() {
+			            	if(controlType == 1) {
+			            		int confirm = JOptionPane.showOptionDialog(frame,
+			                            "Please note that the mouse click event will be disabled when you choose gaze control",
+			                            "Information", 
+			                            JOptionPane.OK_OPTION,
+			                            JOptionPane.PLAIN_MESSAGE, null, null, null);
+			            	}
 			            	dispose();//clost current setting window and open a new keyboard one
-			            	SoftKeyBoardMain soft = new SoftKeyBoardMain(selectedBook);
+			            	SoftKeyBoardMain soft = new SoftKeyBoardMain(controlTye);
 			            	soft.createAndShowGUI();
 			            }
 			        });

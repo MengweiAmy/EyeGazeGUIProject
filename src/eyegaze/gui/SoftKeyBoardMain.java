@@ -6,9 +6,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -86,12 +90,40 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     public void createAndShowGUI() {
     	
     	//Start initial device and calibrate process
-    	EyeDeviceControl.getInstance().initializeDevice();
-    	isDeviceStarted = true;
+    	
+    	/*
+    	 * Every time comment these two lines if don not need device when debugging
+    	 */
+    	
+    	//EyeDeviceControl.getInstance().initializeDevice();
+    	//isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
 	    p1 = createTextField();
+	    
+	    JPanel glass = new JPanel(new GridLayout(0, 1));
+        // trap both mouse and key events.  Could provide a smarter 
+        // key handler if you wanted to allow things like a keystroke 
+        // that would cancel the long-running operation.
+        glass.addMouseListener(new MouseAdapter() {});
+        glass.addMouseMotionListener(new MouseMotionAdapter() {});
+        glass.addKeyListener(new KeyAdapter() {});
+        
+        /*
+         * Make the keyboard visible
+         */
+        glass.setOpaque(false);
+        // make sure the focus won't leave the glass pane
+        // glass.setFocusCycleRoot(true);  // 1.4
+        //padding.setNextFocusableComponent(padding);  // 1.3
+        setGlassPane(glass);
+        if(controlType == "Gaze Control"){
+        	glass.setVisible(true);
+        	//try button click function
+        	//getKeyByPosition(400,400);
+        }
+        
 	    this.setContentPane(p1);
 	    WindowListener exitListener = new WindowAdapter() {
 

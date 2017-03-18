@@ -2,6 +2,11 @@ package eyegaze.device;
 
 import eyegaze.jni.EyeGazeJNI;
 
+/**
+ * The functions related to interact with eye gaze device
+ * @author EYEGAZE 2.3 i7
+ *
+ */
 public class EyeDeviceControl {
 	
 	EyeGazeJNI eyeGaze = new EyeGazeJNI();
@@ -18,7 +23,7 @@ public class EyeDeviceControl {
 	}
 	
 	/*
-	 * Initialize device and start calibrate
+	 * Initialize device and start calibrate process
 	 */
 	public int initializeDevice() {
 		int result = eyeGaze.EyeGazeInit(0);
@@ -30,6 +35,10 @@ public class EyeDeviceControl {
 		return result;
 	}
 	
+	/**
+	 * Start logging the trace data in "trace.dat" file
+	 * @return
+	 */
 	public int startLogging() {
 		int star = eyeGaze.EyeGazeLogStart();
 		if(star == 0) {
@@ -38,6 +47,10 @@ public class EyeDeviceControl {
 		return star;
 	}
 	
+	/**
+	 * Stop logging trace data
+	 * @return
+	 */
 	public int stopLogging() {
 		int star = eyeGaze.EyeGazeLogStop();
 		if(star == 0) {
@@ -46,6 +59,10 @@ public class EyeDeviceControl {
 		return star;
 	}
 
+	/**
+	 * Shut down the eye gaze device
+	 * @return
+	 */
 	public int shutdonwDevice() {
 		int star = eyeGaze.EyeGazeShutDown();
 		if(star == 0) {
@@ -54,6 +71,10 @@ public class EyeDeviceControl {
 		return star;
 	}
 	
+	/**
+	 * Get the time when EgInit() function has been called
+	 * @return
+	 */
 	public long getDeviceInitTime() {
 		return initTime;
 	}
