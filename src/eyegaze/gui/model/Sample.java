@@ -22,7 +22,8 @@ public class Sample {
 		// first change SPACE to underscore
 		if (key.equals(" "))
 			key = "_";
-		return key + ", " + time  + "," + second + "," + xPos + "," + yPos;
+		//return key + ", " + time  + "," + second + "," + xPos + "," + yPos;
+		return  "   "+ key + "     " + time  + "     " + second + "     " + xPos + "     " + yPos + "\n";
 	}
 
 	private long time;

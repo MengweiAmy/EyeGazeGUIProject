@@ -251,7 +251,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy");
         System.out.println( sdf.format(cal.getTime()) );
-		s1 = sdf.format(cal.getTime())+"-"+controlType+".sd";
+		//s1 = sdf.format(cal.getTime())+"-"+controlType+".dat";
+		s1 = "ClickInfo"+"-"+controlType+".dat";
 		try
 		{
 			sd1File = new BufferedWriter(new FileWriter(s1));
@@ -313,8 +314,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 			
 			// build output data for sd1 file
 			StringBuilder sd1Stuff = new StringBuilder();
-			sd1Stuff.append(presentedPhrase).append('\n');
-			sd1Stuff.append(s2).append('\n');
+			//sd1Stuff.append(presentedPhrase).append('\n');
+			//sd1Stuff.append(s2).append('\n');
+			sd1Stuff.append("Letter    Time    Seconds    Xpos     YPos  \n");
 			for (int i = 0; i < samples.size(); ++i)
 				sd1Stuff.append(samples.elementAt(i)).append('\n');
 			sd1Stuff.append('#').append('\n');
