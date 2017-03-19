@@ -27,6 +27,9 @@ import java.util.Calendar;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -37,14 +40,17 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import eyegaze.device.EyeDeviceControl;
+import eyegaze.device.RetrieveDataThread;
 import eyegaze.gui.control.AnalysisGazeLog;
 import eyegaze.gui.control.MouseControlService;
 import eyegaze.gui.model.KeyBt;
 import eyegaze.gui.model.Sample;
+import eyegaze.jni.EyeGazeData;
 
 public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
@@ -83,6 +89,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private boolean isDeviceStarted = false;
 	private String controlType;
 	
+	RetrieveDataThread retriThread;
+	boolean isThreadStarted = false;
+	
 	public SoftKeyBoardMain(String controlType) {
 		this.controlType = controlType;
 	}
@@ -95,30 +104,30 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	 * Every time comment these two lines if don not need device when debugging
     	 */
     	
-    	//EyeDeviceControl.getInstance().initializeDevice();
-    	//isDeviceStarted = true;
+    	EyeDeviceControl.getInstance().initializeDevice();
+        isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
 	    p1 = createTextField();
-	    
-	    JPanel glass = new JPanel(new GridLayout(0, 1));
-        // trap both mouse and key events.  Could provide a smarter 
-        // key handler if you wanted to allow things like a keystroke 
-        // that would cancel the long-running operation.
-        glass.addMouseListener(new MouseAdapter() {});
-        glass.addMouseMotionListener(new MouseMotionAdapter() {});
-        glass.addKeyListener(new KeyAdapter() {});
-        
-        /*
-         * Make the keyboard visible
-         */
-        glass.setOpaque(false);
-        // make sure the focus won't leave the glass pane
-        // glass.setFocusCycleRoot(true);  // 1.4
-        //padding.setNextFocusableComponent(padding);  // 1.3
-        setGlassPane(glass);
-        if(controlType == "Gaze Control"){
+	    System.out.println(controlType);
+        if(controlType.equals("Gaze Control")){
+    	    JPanel glass = new JPanel(new GridLayout(0, 1));
+            // trap both mouse and key events.  Could provide a smarter 
+            // key handler if you wanted to allow things like a keystroke 
+            // that would cancel the long-running operation.
+            glass.addMouseListener(new MouseAdapter() {});
+            glass.addMouseMotionListener(new MouseMotionAdapter() {});
+            glass.addKeyListener(new KeyAdapter() {});
+            
+            /*
+             * Make the keyboard visible
+             */
+            glass.setOpaque(false);
+            // make sure the focus won't leave the glass pane
+            // glass.setFocusCycleRoot(true);  // 1.4
+            //padding.setNextFocusableComponent(padding);  // 1.3
+            setGlassPane(glass);
         	glass.setVisible(true);
         	//try button click function
         	//getKeyByPosition(400,400);
@@ -134,12 +143,35 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                         "Exit Confirmation", JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE, null, null, null);
                 if (confirm == JOptionPane.YES_OPTION) {
-                	if(isDeviceStarted) {
-                    	EyeDeviceControl.getInstance().stopLogging();
-                    	EyeDeviceControl.getInstance().shutdonwDevice();
+                	
+                	//Stop get data thread first and then shut down device
+                	if(isThreadStarted) {
+                		System.out.println("JAVA log: shutting down the fetch data thread..");
+                		retriThread.destory();
+                		EyeDeviceControl.getInstance().stopDataCollection();
+                		isThreadStarted = false;
                 	}
-                	MouseControlService service = new MouseControlService();
-        			service.verifyFixtionData(AnalysisGazeLog.getInstance().getEyeGazeData());
+                	try {
+                		/**
+                		 * Try to sleep for 3 seconds and the shut down the device
+                		 */
+						Thread.sleep(1000);
+						if(isDeviceStarted) {
+	                    	EyeDeviceControl.getInstance().stopLogging();
+	                    	EyeDeviceControl.getInstance().shutdonwDevice();
+	                	}
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+                	
+                	//If current retrieve data thread is running
+                	//Terminate it when close the application window
+
+                	if(controlType == "Mouse Control"){
+                		MouseControlService service = new MouseControlService();
+                		service.verifyFixtionData(AnalysisGazeLog.getInstance().getEyeGazeData());
+                	}
                 	System.exit(0);
                 }
             }
@@ -147,6 +179,16 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
         this.addWindowListener(exitListener);
 	    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	    this.setVisible(true);
+	    if(controlType == "Gaze Control"){
+		    startGazeControl();
+	    }
+    }
+    
+    public void startGazeControl() {
+    	System.out.println("JAVA log: enter gaze control...");
+    	retriThread = new RetrieveDataThread();
+    	retriThread.run();
+    	isThreadStarted = true;
     }
     
     public JPanel createTextField() {
@@ -409,6 +451,18 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	public JPanel getMainPanel() {
 		return p1;
+	}
+	
+	/**
+	 * TODO
+	 * Figure out it later
+	 */
+	private void disableKeys() {
+		for(int i=0; i<keyboardSet.length;i++) {
+			KeyBt key = keyboardSet[i];
+			String label = key.getLabel();
+			text2.getInputMap().put(KeyStroke.getKeyStroke(label), "none");
+		}
 	}
     
 }

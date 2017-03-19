@@ -1,5 +1,6 @@
 package eyegaze.device;
 
+import eyegaze.jni.EyeGazeData;
 import eyegaze.jni.EyeGazeJNI;
 
 /**
@@ -11,6 +12,10 @@ public class EyeDeviceControl {
 	
 	EyeGazeJNI eyeGaze = new EyeGazeJNI();
 	
+	int count = 0;
+	
+	EyeGazeData[] dataArr = new EyeGazeData[100];
+	
 	private static EyeDeviceControl control;
 	
 	private long initTime;
@@ -20,6 +25,31 @@ public class EyeDeviceControl {
 			control = new EyeDeviceControl();
 		}
 		return control;
+	}
+	
+	/*
+	 * Retrieve eye gaze data when using gaze control
+	 */
+	public EyeGazeData getEyeGazeData() {
+		EyeGazeData data = eyeGaze.getEyeGazeData();
+		if(data != null) {
+			System.out.println("get data" + data.getiIGaze());
+		}else {
+			System.out.println("NO DATA!!!!!");
+		}
+		return null;
+	}
+	
+	public EyeGazeData[] getDataTest() {
+		if(dataArr != null && dataArr.length > 0) {
+			System.out.println("receive data:");
+			for(int i=0;i< dataArr.length; i++) {
+				System.out.println("receive y data:" + dataArr[i].getiJGaze());
+			}
+		}else {
+			System.out.println("NO DATA!!!!!");
+		}
+		return dataArr;
 	}
 	
 	/*
@@ -77,5 +107,12 @@ public class EyeDeviceControl {
 	 */
 	public long getDeviceInitTime() {
 		return initTime;
+	}
+	
+	/**
+	 * Stop the data collection thread in C++ project
+	 */
+	public void stopDataCollection() {
+		eyeGaze.StopDataCollection();
 	}
 }

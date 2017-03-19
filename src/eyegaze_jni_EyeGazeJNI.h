@@ -34,9 +34,9 @@ JNIEXPORT jint JNICALL Java_eyegaze_jni_EyeGazeJNI_Calibrate
 /*
  * Class:     eyegaze_jni_EyeGazeJNI
  * Method:    getEyeGazeData
- * Signature: ()[Leyegaze/jni/EyeGazeData;
+ * Signature: ()Leyegaze/jni/EyeGazeData;
  */
-JNIEXPORT jobjectArray JNICALL Java_eyegaze_jni_EyeGazeJNI_getEyeGazeData
+JNIEXPORT jobject JNICALL Java_eyegaze_jni_EyeGazeJNI_getEyeGazeData
   (JNIEnv *, jobject);
 
 /*
@@ -62,6 +62,14 @@ JNIEXPORT jint JNICALL Java_eyegaze_jni_EyeGazeJNI_EyeGazeLogStop
  */
 JNIEXPORT jint JNICALL Java_eyegaze_jni_EyeGazeJNI_VerifyFixation
   (JNIEnv *, jobject, jobjectArray);
+
+/*
+ * Class:     eyegaze_jni_EyeGazeJNI
+ * Method:    StopDataCollection
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_eyegaze_jni_EyeGazeJNI_StopDataCollection
+  (JNIEnv *, jobject);
 
 #ifdef __cplusplus
 }

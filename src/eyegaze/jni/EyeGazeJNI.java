@@ -26,7 +26,7 @@ public class EyeGazeJNI {
 	   
 	   //Get the eye gaze data from the buffer
 	   //TODO
-	   public native EyeGazeData[] getEyeGazeData();
+	   public native EyeGazeData getEyeGazeData();
 	   
 	   //Start to log the gaze data
 	   public native int EyeGazeLogStart();
@@ -36,5 +36,10 @@ public class EyeGazeJNI {
 	   
 	   //Analysis the fixation data based on existed log
 	   public native int VerifyFixation(EyeGazeData[] gazeDatalist);
+	   
+	   //Manually stop data collection
+	   //It is necessary to be called before shut down the device
+	   //Otherwise the device cannot be shutdown correctly
+	   public native void StopDataCollection();
 
 }
