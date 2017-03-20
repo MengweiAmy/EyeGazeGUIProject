@@ -6,13 +6,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -27,20 +23,19 @@ import java.util.Calendar;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -50,7 +45,6 @@ import eyegaze.gui.control.AnalysisGazeLog;
 import eyegaze.gui.control.MouseControlService;
 import eyegaze.gui.model.KeyBt;
 import eyegaze.gui.model.Sample;
-import eyegaze.jni.EyeGazeData;
 
 public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
@@ -69,6 +63,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	private JPanel p1;
 	JButton[] jbtnList;
+	private JProgressBar[] progressBarList;
 	
 	private JTextField text1;
 	private JTextField text2;
@@ -93,6 +88,14 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	boolean isThreadStarted = false;
 	
 	private static SoftKeyBoardMain softKeyboard;
+	private static GlassPaneComp glass;
+	
+	/*************************************Progress bar parameter*********************************************/
+	private int currentIndex=-1;
+	
+	private int currentLayer = 3;
+	
+	Keyboard keyboardLayerPanel;
 	
 	public static SoftKeyBoardMain getInstance() {
 		if(softKeyboard == null) {
@@ -120,29 +123,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	    frame.setTitle("Current Control Type:" + controlType);
 	    p1 = createTextField();
 	    System.out.println(controlType);
-        if(controlType.equals("Gaze Control")){
-    	    JPanel glass = new JPanel(new GridLayout(0, 1));
-            // trap both mouse and key events.  Could provide a smarter 
-            // key handler if you wanted to allow things like a keystroke 
-            // that would cancel the long-running operation.
-            glass.addMouseListener(new MouseAdapter() {});
-            glass.addMouseMotionListener(new MouseMotionAdapter() {});
-            glass.addKeyListener(new KeyAdapter() {});
-            
-            /*
-             * Make the keyboard visible
-             */
-            glass.setOpaque(false);
-            // make sure the focus won't leave the glass pane
-            // glass.setFocusCycleRoot(true);  // 1.4
-            //padding.setNextFocusableComponent(padding);  // 1.3
-            setGlassPane(glass);
-        	glass.setVisible(true);
-        	//try button click function
-        	//getKeyByPosition(400,400);
-        }
-        
+	    p1.setOpaque(true); 
 	    this.setContentPane(p1);
+	    
 	    WindowListener exitListener = new WindowAdapter() {
 
             @Override
@@ -185,13 +168,16 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                 }
             }
         };
+        
         this.addWindowListener(exitListener);
 	    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	    this.setVisible(true);
 	    if(controlType == "Gaze Control"){
-		    startGazeControl();
+		    //startGazeControl();
 	    }
     }
+    
+
     
     public void startGazeControl() {
     	System.out.println("JAVA log: enter gaze control...");
@@ -241,7 +227,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		p1.add(text2Panel);
 		p1.add(Box.createRigidArea(new Dimension(100, 30)));
 		
-		JPanel keyboardPanel = createKeyboard();
+		JPanel keyboardPanel = new JPanel();
+		keyboardPanel.add(createKeyboard());
 		
 		JPanel p = new JPanel(new BorderLayout());
 		p.add(p1, "North");
@@ -250,7 +237,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		return p;
     }
     
-    public JPanel createKeyboard() {
+    public JLayeredPane createKeyboard() {
     	
     	//Adjust the key size with different screen size
     	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -277,16 +264,17 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     			new KeyBt("Enter", (w / 3) + 9 * w, 1 * h, 2 * w, h), new KeyBt("Bksp", 10 * w, 0, 2 * w, h),
     			new KeyBt("Setting", 0 * w, 4 * h, 12 * w, h), new KeyBt("Shift", (2 * w / 3) + 7 * w, 2 * h, 4 * w, h),};
     	
-    	Keyboard keyboard = new Keyboard(qwertyKeyboard, this, 1);
+    	keyboardLayerPanel = new Keyboard(qwertyKeyboard, this, controlType);
     	keyboardSet = qwertyKeyboard;
-    	jbtnList = keyboard.getJButtonList();
-    	JPanel keyboardPanel = new JPanel();
-		keyboardPanel.add(keyboard);
-		keyboardPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    	jbtnList = keyboardLayerPanel.getJButtonList();
+    	progressBarList = keyboardLayerPanel.getProgressBarList();
+//    	JPanel keyboardPanel = new JPanel();
+//		keyboardPanel.add(keyboardLayerPanel);
+//		keyboardPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
-		return keyboardPanel;
+		return keyboardLayerPanel;
     }
-    
+	
     public void loadPhrases() {
     	// ------------------
     	// initialize phrases
@@ -370,6 +358,32 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		char c = (s.toLowerCase()).charAt(0);
 		System.out.println(s+" is clicked");
 		
+		if(controlType.equals("Gaze Control")) {
+			for(int i=0;i < jbtnList.length; i++) {
+				JButton jt = jbtnList[i];
+				JProgressBar proBar = progressBarList[i];
+				if(s.equals(jt.getText())) {
+					System.out.println("current click btn: " + s);
+					System.out.println("current index: " + currentIndex);
+					System.out.println("current i: " + i);
+					System.out.println("current layer: " + currentLayer);
+					if(currentIndex != -1) {
+						proBar.setValue(0);//Restart the circle count value from 0
+						keyboardLayerPanel.setLayer(jbtnList[currentIndex], currentLayer++);
+					}
+					currentIndex = i;
+					keyboardLayerPanel.setLayer(progressBarList[i], currentLayer++);
+					
+					Timer timer = new Timer(50, e -> {
+					      int iv = Math.min(100, proBar.getValue() + 1);
+					      proBar.setValue(iv);
+					});
+					timer.restart();
+					break;
+				}
+			}
+		}
+
 		int x = jb.getX();
 		//Add the offset of jPanel. The raw Y axis is the position based on keyboard panel
 		//Should add the height of text area, then it is the real position of the button
@@ -390,51 +404,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		samples.addElement(newSam);
 
 		if (s.equals("Enter")){
-			initilizeOutput();
-			//TODO Finish current input and write the log
-			//Stop logging the eyegaze data if the eye tracker is started
-			String s2 = text2.getText().toLowerCase();
-			
-			// build output data for sd1 file
-			StringBuilder sd1Stuff = new StringBuilder();
-			//sd1Stuff.append(presentedPhrase).append('\n');
-			//sd1Stuff.append(s2).append('\n');
-			sd1Stuff.append("Letter    Time    Seconds    Xpos     YPos  \n");
-			for (int i = 0; i < samples.size(); ++i)
-				sd1Stuff.append(samples.elementAt(i)).append('\n');
-			sd1Stuff.append('#').append('\n');
-			
-			// dump data
-			try
-			{
-				sd1File.write(sd1Stuff.toString(), 0, sd1Stuff.length());
-				sd1File.flush();
-			} catch (IOException e)
-			{
-				System.err.println("ERROR WRITING TO DATA FILE!\n" + e);
-				System.exit(1);
-			}
-
-			JLabel thankyou = new JLabel("End of block. Thank you.");
-			thankyou.setFont(new Font("sansserif", Font.PLAIN, 16));
-			JOptionPane.showMessageDialog(this, thankyou);
-			try
-			{
-				sd1File.close();
-			} catch (IOException e)
-			{
-				System.err.println("ERROR CLOSING DATA FILES!\n" + e);
-				System.exit(1);
-			}
-
-			// prepare for next phrase
-		    samples = new Vector<Sample>();
-			presentedPhrase = phrases[r.nextInt(phrases.length)];
-			text1.setText(presentedPhrase);
-			targetPhrase = "";
-			text2.setText(targetPhrase);
-			t1 = 0;
-			count = 0;
+			enterPressed();
 		}else if (s.equals("Bksp"))
 		{
 			if (targetPhrase.length() >= 1)
@@ -456,6 +426,54 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 			text2.requestFocus(); // so I-beam (caret) does not disappear
 		}
 		
+	}
+	
+	private void enterPressed() {
+		initilizeOutput();
+		//TODO Finish current input and write the log
+		//Stop logging the eyegaze data if the eye tracker is started
+		String s2 = text2.getText().toLowerCase();
+		
+		// build output data for sd1 file
+		StringBuilder sd1Stuff = new StringBuilder();
+		//sd1Stuff.append(presentedPhrase).append('\n');
+		//sd1Stuff.append(s2).append('\n');
+		sd1Stuff.append("Letter    Time    Seconds    Xpos     YPos  \n");
+		for (int i = 0; i < samples.size(); ++i)
+			sd1Stuff.append(samples.elementAt(i)).append('\n');
+		sd1Stuff.append('#').append('\n');
+		
+		// dump data
+		try
+		{
+			sd1File.write(sd1Stuff.toString(), 0, sd1Stuff.length());
+			sd1File.flush();
+		} catch (IOException e)
+		{
+			System.err.println("ERROR WRITING TO DATA FILE!\n" + e);
+			System.exit(1);
+		}
+
+		JLabel thankyou = new JLabel("End of block. Thank you.");
+		thankyou.setFont(new Font("sansserif", Font.PLAIN, 16));
+		JOptionPane.showMessageDialog(this, thankyou);
+		try
+		{
+			sd1File.close();
+		} catch (IOException e)
+		{
+			System.err.println("ERROR CLOSING DATA FILES!\n" + e);
+			System.exit(1);
+		}
+
+		// prepare for next phrase
+	    samples = new Vector<Sample>();
+		presentedPhrase = phrases[r.nextInt(phrases.length)];
+		text1.setText(presentedPhrase);
+		targetPhrase = "";
+		text2.setText(targetPhrase);
+		t1 = 0;
+		count = 0;
 	}
 	
 	public JPanel getMainPanel() {

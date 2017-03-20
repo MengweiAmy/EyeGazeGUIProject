@@ -14,13 +14,17 @@ import javax.swing.JComponent;
 import javax.swing.plaf.basic.BasicProgressBarUI;
 
 public class ProgressCircleUI extends BasicProgressBarUI {
+
+	//Set the button height as the radium
+	private int radium=70;
 	
 	@Override public Dimension getPreferredSize(JComponent c) {
 	    Dimension d = super.getPreferredSize(c);
 	    int v = Math.max(d.width, d.height);
-	    d.setSize(v, v);
+	    d.setSize(radium, radium);
 	    return d;
 	  }
+	
 	  @Override public void paint(Graphics g, JComponent c) {
 	    Insets b = progressBar.getInsets(); // area for border
 	    int barRectWidth  = progressBar.getWidth()  - b.right - b.left;
@@ -38,13 +42,16 @@ public class ProgressCircleUI extends BasicProgressBarUI {
 	    double sz = Math.min(barRectWidth, barRectHeight);
 	    double cx = b.left + barRectWidth  * .5;
 	    double cy = b.top  + barRectHeight * .5;
+
 	    double or = sz * .5;
 	    double ir = or * .5; //or - 20;
+
 	    Shape inner = new Ellipse2D.Double(cx - ir, cy - ir, ir * 2, ir * 2);
 	    Shape outer = new Arc2D.Double(
 	        cx - or, cy - or, sz, sz, 90 - degree, degree, Arc2D.PIE);
+
 	    Area area = new Area(outer);
-	    area.subtract(new Area(inner));
+	    //area.subtract(new Area(inner));
 	    g2.fill(area);
 	    g2.dispose();
 

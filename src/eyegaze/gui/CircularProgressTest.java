@@ -29,10 +29,15 @@ public class CircularProgressTest {
 	    EventQueue.invokeLater(() -> {
 	      JFrame f = new JFrame();
 	      f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-	      f.getContentPane().add(new CircularProgressTest().makeUI());
+	      JPanel newPanel = new JPanel(new CardLayout());
+	      newPanel.add(new CircularProgressTest().makeUI());
+	      
+	      //f.getContentPane().add(new CircularProgressTest().makeUI());
 	      f.setSize(320, 240);
 	      f.setLocationRelativeTo(null);
 	      f.setVisible(true);
+	      
+	      f.setContentPane(newPanel);
 	    });
 	  }
 
