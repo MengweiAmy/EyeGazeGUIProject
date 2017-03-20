@@ -2,3 +2,4 @@
 /src/eyegaze/gui/testcode/
 *.sd
 *.dat
+*.dll
