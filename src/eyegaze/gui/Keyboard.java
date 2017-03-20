@@ -61,6 +61,9 @@ public class Keyboard extends JLayeredPane implements ActionListener {
 			keyButtonMap.put(key[i], keyButton[i]);
 			add(keyButton[i], new Integer(2));
 			
+			/*
+			 * If gaze control mode, add progress bar on each button
+			 */
 			if(controlType.equals("Gaze Control")) {
 				progressBar[i] = createProgressBar();
 				progressBar[i].setBounds(key[i].getX(), key[i].getY(), key[i].getW(), key[i].getH());
@@ -73,6 +76,10 @@ public class Keyboard extends JLayeredPane implements ActionListener {
 		this.setMaximumSize(d);
 	}
 	
+	/**
+	 * Create a progress bar
+	 * @return
+	 */
 	private JProgressBar createProgressBar() {
 	    JProgressBar progress = new JProgressBar();
 	    // use JProgressBar#setUI(...) method

@@ -6,9 +6,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -46,6 +50,17 @@ import eyegaze.gui.control.MouseControlService;
 import eyegaze.gui.model.KeyBt;
 import eyegaze.gui.model.Sample;
 
+/**
+ * If using pure application mode, Please comment three lines of code
+ * 
+ * 1. EyeDeviceControl.getInstance().initializeDevice();
+      isDeviceStarted = true;
+      in the beginning of the createAndShowGUI() function
+      
+   2. startGazeControl(); in the end of createAndShowGUI() function
+ * @author EYEGAZE 2.3 i7
+ *
+ */
 public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	/**
@@ -80,7 +95,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private int count; // count keystrokes per phrase
 	private Random r = new Random();//generate random index to display random sentence from phrase file
 	
-	private boolean isLogstared;
+	private boolean isLogstared = false;
 	private boolean isDeviceStarted = false;
 	private String controlType;
 	
@@ -88,7 +103,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	boolean isThreadStarted = false;
 	
 	private static SoftKeyBoardMain softKeyboard;
-	private static GlassPaneComp glass;
 	
 	/*************************************Progress bar parameter*********************************************/
 	private int currentIndex=-1;
@@ -116,13 +130,34 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	 * Every time comment these two lines if don not need device when debugging
     	 */
     	
-    	EyeDeviceControl.getInstance().initializeDevice();
-        isDeviceStarted = true;
+    	//EyeDeviceControl.getInstance().initializeDevice();
+        //isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
 	    p1 = createTextField();
 	    System.out.println(controlType);
+	    
+	    if(controlType.equals("Gaze Control")) {
+	    	JPanel glass = new JPanel(new GridLayout(0, 1));
+            // trap both mouse and key events.  Could provide a smarter 
+            // key handler if you wanted to allow things like a keystroke 
+            // that would cancel the long-running operation.
+            glass.addMouseListener(new MouseAdapter() {});
+            glass.addMouseMotionListener(new MouseMotionAdapter() {});
+            glass.addKeyListener(new KeyAdapter() {});
+            
+            /*
+             * Make the keyboard visible
+             */
+            glass.setOpaque(false);
+            // make sure the focus won't leave the glass pane
+            // glass.setFocusCycleRoot(true);  // 1.4
+            //padding.setNextFocusableComponent(padding);  // 1.3
+            setGlassPane(glass);
+        	glass.setVisible(true);
+	    }
+	    
 	    p1.setOpaque(true); 
 	    this.setContentPane(p1);
 	    
@@ -173,11 +208,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	    this.setVisible(true);
 	    if(controlType == "Gaze Control"){
-		    startGazeControl();
+		    //startGazeControl();
 	    }
     }
     
-
     
     public void startGazeControl() {
     	System.out.println("JAVA log: enter gaze control...");
