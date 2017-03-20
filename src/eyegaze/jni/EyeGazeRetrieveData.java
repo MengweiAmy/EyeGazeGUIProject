@@ -6,6 +6,13 @@ import java.util.List;
 import eyegaze.gui.SoftKeyBoardMain;
 import eyegaze.gui.model.FixationModel;
 
+/**
+ * JNI callback class
+ * C++ will call receivegazedata() to pass the gaze data to Java application
+ * DO NOT modify the class name and function name
+ * @author EYEGAZE 2.3 i7
+ *
+ */
 public class EyeGazeRetrieveData {
 	
 	/*

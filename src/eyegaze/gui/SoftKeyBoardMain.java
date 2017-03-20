@@ -138,6 +138,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	    p1 = createTextField();
 	    System.out.println(controlType);
 	    
+	    /*
+	     * Add glass pane on keyboard panel to avoid mouse click events
+	     */
 	    if(controlType.equals("Gaze Control")) {
 	    	JPanel glass = new JPanel(new GridLayout(0, 1));
             // trap both mouse and key events.  Could provide a smarter 
@@ -437,10 +440,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		newSam.setYPos(y);
 		samples.addElement(newSam);
 
-		if (s.equals("Enter")){
+		if (s.equals("Enter")) {
 			enterPressed();
-		}else if (s.equals("Bksp"))
-		{
+		}else if (s.equals("Bksp")) {
 			if (targetPhrase.length() >= 1)
 			{
 				targetPhrase = targetPhrase.substring(0, targetPhrase.length() - 1);

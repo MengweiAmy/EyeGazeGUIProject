@@ -1,9 +1,11 @@
-package eyegaze.gui;
+package eyegaze.gui.testcode;
 
 
 
 import java.awt.*;
 import javax.swing.*;
+
+import eyegaze.gui.ProgressCircleUI;
 
 public class CircularProgressTest {
 	

@@ -4,8 +4,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import eyegaze.jni.EyeGazeData;
-
 public class RetrieveDataThread extends Thread {
 	
 	ScheduledExecutorService executor;
@@ -14,15 +12,10 @@ public class RetrieveDataThread extends Thread {
 		Runnable helloRunnable = new Runnable() {
 		    public void run() {
 		        System.out.println("JAVA log: Start to fetch data.....");
-		        EyeGazeData data = EyeDeviceControl.getInstance().getEyeGazeData();
-        		if(data != null) {
-        			System.out.println("JAVA log: data getiIGaze....." + data.getiIGaze());
-        			System.out.println("JAVA log: data getfXEyeballOffsetMm....." + data.getfXEyeballOffsetMm());
-        			System.out.println("JAVA log: data getiJGaze....." + data.getiJGaze());
-        			System.out.println("JAVA log: data getCameraFieldCount....." + data.getCameraFieldCount());
-        		}else {
-        			System.out.println("JAVA log: no data collected.....");
-        		}
+		        /*
+		         * Call C++ function in order to active the c++ callback function
+		         */
+		        EyeDeviceControl.getInstance().getEyeGazeData();
 		    }
 		};
 
