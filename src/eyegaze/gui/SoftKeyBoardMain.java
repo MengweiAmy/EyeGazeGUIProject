@@ -173,7 +173,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	    this.setVisible(true);
 	    if(controlType == "Gaze Control"){
-		    //startGazeControl();
+		    startGazeControl();
 	    }
     }
     
