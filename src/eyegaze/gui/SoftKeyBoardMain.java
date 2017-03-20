@@ -92,9 +92,18 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	RetrieveDataThread retriThread;
 	boolean isThreadStarted = false;
 	
-	public SoftKeyBoardMain(String controlType) {
-		this.controlType = controlType;
+	private static SoftKeyBoardMain softKeyboard;
+	
+	public static SoftKeyBoardMain getInstance() {
+		if(softKeyboard == null) {
+			softKeyboard = new SoftKeyBoardMain();
+		}
+		return softKeyboard;
 	}
+	
+//	public SoftKeyBoardMain(String controlType) {
+//		this.controlType = controlType;
+//	}
 
     public void createAndShowGUI() {
     	
@@ -155,7 +164,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                 		/**
                 		 * Try to sleep for 3 seconds and the shut down the device
                 		 */
-						Thread.sleep(1000);
+						Thread.sleep(500);
 						if(isDeviceStarted) {
 	                    	EyeDeviceControl.getInstance().stopLogging();
 	                    	EyeDeviceControl.getInstance().shutdonwDevice();
@@ -350,7 +359,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent action) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("Entered by gaze control");
 		if(!isLogstared && isDeviceStarted) {
 			EyeDeviceControl.getInstance().startLogging();
 			isLogstared = true;
@@ -465,4 +474,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		}
 	}
     
+	public void setControlType(String controlType) {
+		this.controlType = controlType;
+	}
 }

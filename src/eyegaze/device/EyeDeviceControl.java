@@ -32,11 +32,6 @@ public class EyeDeviceControl {
 	 */
 	public EyeGazeData getEyeGazeData() {
 		EyeGazeData data = eyeGaze.getEyeGazeData();
-		if(data != null) {
-			System.out.println("get data" + data.getiIGaze());
-		}else {
-			System.out.println("NO DATA!!!!!");
-		}
 		return null;
 	}
 	

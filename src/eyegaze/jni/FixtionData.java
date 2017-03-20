@@ -90,6 +90,6 @@ public class FixtionData {
 
 	public void setiFixtionIndex(int iFixtionIndex) {
 		this.iFixtionIndex = iFixtionIndex;
-	}	
+	}
 	
 }

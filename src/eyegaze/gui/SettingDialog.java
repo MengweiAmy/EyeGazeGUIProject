@@ -87,23 +87,27 @@ public class SettingDialog extends JFrame implements ActionListener{
 			    @Override
 			    public void actionPerformed(ActionEvent event) {
 			        String controlTye = (String) controlTypeCombo.getSelectedItem();
-			        if (controlTye.equals("Mouse Controll")) {
-			        	controlType = 0;
-			        } else if (controlTye.equals("Gaze Control")) {
-			            controlType = 1;
-			        }
+//			        if (controlTye.equals("Mouse Controll")) {
+//			        	controlType = 0;
+//			        } else if (controlTye.equals("Gaze Control")) {
+//			            controlType = 1;
+//			        }
 			        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			            public void run() {
-			            	if(controlType == 1) {
+			            	if(controlTye.equals("Gaze Control")) {
 			            		int confirm = JOptionPane.showOptionDialog(frame,
 			                            "Please note that the mouse click event will be disabled when you choose gaze control",
 			                            "Information", 
 			                            JOptionPane.OK_OPTION,
 			                            JOptionPane.PLAIN_MESSAGE, null, null, null);
 			            	}
-			            	dispose();//clost current setting window and open a new keyboard one
-			            	SoftKeyBoardMain soft = new SoftKeyBoardMain(controlTye);
-			            	soft.createAndShowGUI();
+			            	dispose();//close current setting window and open a new keyboard one
+			            	
+			            	/*
+			            	 * Set controlType when start the application
+			            	 */
+			            	SoftKeyBoardMain.getInstance().setControlType(controlTye);
+			            	SoftKeyBoardMain.getInstance().createAndShowGUI(); 
 			            }
 			        });
 			    }
