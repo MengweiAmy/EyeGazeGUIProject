@@ -16,8 +16,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+
+import eyegaze.gui.tools.SpringUtilities;
 
 /**
  * Application entry to choose the control type : 
@@ -33,6 +36,16 @@ public class SettingDialog extends JFrame implements ActionListener{
 	int controlType=0;
 	
 	private JComboBox controlTypeCombo;
+	
+	private JComboBox fixationSampleCombo;
+	
+	private JComboBox fixationOffsetCombo;
+	
+	String[] sampleList = {"20","50","75","100","150","200"};
+	
+	String[] offsetList = {"30","50","65","75","100"};
+	
+	String[] dwellList = {"50", "100","200","300","500"};
 
 	/**
 	 * 
@@ -42,19 +55,43 @@ public class SettingDialog extends JFrame implements ActionListener{
 	public void createDialog() {
 		 JFrame frame = this;
 		 int w = 600;
-		 int h = 400;
+		 int h = 300;
 		 setSize(new Dimension(w, h));
 	     frame.setLocationRelativeTo(null);
 	     frame.setTitle("Settings");
+	     
+	     String[] labels = {"Select Control Type:", "Select Minimum fixation samples:", "Select Minimum fixation offset:", "Select dwell time(millSec):"};
+	     
+	     String[] types = { "Mouse Control", "Gaze Control"};
+
+	     int numPairs = labels.length;
+
+	     //Create and populate the panel.
+	     JPanel p = new JPanel(new SpringLayout());
+	     for (int i = 0; i < numPairs; i++) {
+	         JLabel l = new JLabel(labels[i], JLabel.TRAILING);
+	         p.add(l);
+	         if(i==1) {
+	        	 types = sampleList;
+	         }else if(i==2){
+	        	 types = offsetList;
+	         }else if(i==3) {
+	        	 types = dwellList;
+	         }
+	         JComboBox textField = new JComboBox(types);
+	         l.setLabelFor(textField);
+	         p.add(textField);
+	     }
+
+	     //Lay out the panel.
+	     SpringUtilities.makeCompactGrid(p,
+	                                     numPairs, 2, //rows, cols
+	                                     2, 3,        //initX, initY
+	                                     2, 3);       //xPad, yPad
 
 	     JPanel text1Panel = new JPanel();
-		 text1Panel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		 text1Panel.setLayout(new BoxLayout(text1Panel, BoxLayout.PAGE_AXIS));
 		 text1Panel.setBorder(new TitledBorder(new EtchedBorder(), "Configuration"));
-		 
-		 String[] types = { "Mouse Control", "Gaze Control"};
-
-			//Create the combo box, select item at index 4.
-			//Indices start at 0, so 4 specifies the pig.
 		 
 		 JLabel label1 = new JLabel("Select Control Type:");
 		 
@@ -63,23 +100,40 @@ public class SettingDialog extends JFrame implements ActionListener{
 		 controlTypeCombo.addActionListener(this);
 		 controlTypeCombo.setPreferredSize(new Dimension(200,30));
 		 
+		 JLabel label2 = new JLabel("Select Minimum fixation samples:");
+		 fixationSampleCombo = new JComboBox(sampleList);
+		 fixationSampleCombo.setSelectedIndex(0);
+		 fixationSampleCombo.addActionListener(this);
+		 fixationSampleCombo.setPreferredSize(new Dimension(200,30));
+		 
+		 JLabel label3 = new JLabel("Select Minimum fixation offset:");
+		 fixationOffsetCombo = new JComboBox(sampleList);
+		 fixationOffsetCombo.setSelectedIndex(0);
+		 fixationOffsetCombo.addActionListener(this);
+		 fixationOffsetCombo.setPreferredSize(new Dimension(200,30));
+		 
 		 
 		 JPanel text2Panel = new JPanel();
 		 text2Panel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		 
 		 JButton b=new JButton("OK");  
 		 b.setBounds(50,100,95,30);  
-		    
 			
 		 text1Panel.add(label1,BorderLayout.CENTER);
 		 text1Panel.add(controlTypeCombo,BorderLayout.CENTER);
+		 
+		 text1Panel.add(label2,BorderLayout.CENTER);
+		 text1Panel.add(fixationSampleCombo,BorderLayout.CENTER);
+		 
+		 text1Panel.add(label3,BorderLayout.CENTER);
+		 text1Panel.add(fixationOffsetCombo,BorderLayout.CENTER);
 		 
 		 text2Panel.add(b,BorderLayout.CENTER);
 		 
 		 JPanel p1 = new JPanel();
 		 p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
 			
-		 p1.add(text1Panel);
+		 p1.add(p);
 		 p1.add(text2Panel);
 		 this.setContentPane(p1);
 		 
@@ -87,11 +141,6 @@ public class SettingDialog extends JFrame implements ActionListener{
 			    @Override
 			    public void actionPerformed(ActionEvent event) {
 			        String controlTye = (String) controlTypeCombo.getSelectedItem();
-//			        if (controlTye.equals("Mouse Controll")) {
-//			        	controlType = 0;
-//			        } else if (controlTye.equals("Gaze Control")) {
-//			            controlType = 1;
-//			        }
 			        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			            public void run() {
 			            	if(controlTye.equals("Gaze Control")) {
@@ -104,10 +153,10 @@ public class SettingDialog extends JFrame implements ActionListener{
 			            	dispose();//close current setting window and open a new keyboard one
 			            	
 			            	/*
-			            	 * Set controlType when start the application
+			            	 * Set controlType before start the application
 			            	 */
-			            	SoftKeyBoardMain.getInstance().setControlType(controlTye);
-			            	SoftKeyBoardMain.getInstance().createAndShowGUI(); 
+			            	//SoftKeyBoardMain.getInstance().setControlType(controlTye);
+			            	//SoftKeyBoardMain.getInstance().createAndShowGUI(); 
 			            }
 			        });
 			    }
@@ -139,9 +188,6 @@ public class SettingDialog extends JFrame implements ActionListener{
             public void run() {
             	SettingDialog soft = new SettingDialog();
             	soft.createDialog();
-            	
-            	//String value = soft.getKeyByPosition(360,200);
-            	//System.out.println(value);
             }
         });
 

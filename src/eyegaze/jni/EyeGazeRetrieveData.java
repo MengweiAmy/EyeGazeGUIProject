@@ -33,13 +33,7 @@ public class EyeGazeRetrieveData {
 	
 	private static boolean isNotified = false;
 	
-	private static double time1 = -1;
-	
-	private static List<FixationIndex> indexInfo = new ArrayList<FixationIndex>();
-	
 	private static List<EyeGazeData> rawData = new ArrayList<EyeGazeData>();
-	
-	private static int receivedDataSize = 0;
 	 
 	/*
 	 * The same fixation gaze data, 
@@ -59,15 +53,9 @@ public class EyeGazeRetrieveData {
 		if(data != null) {
 			//Used in written log
 			rawData.add(data);
-			receivedDataSize ++;
 			
 			int pupilXPos = data.getiIGaze();
 			int pupilYPos = data.getiJGaze();		
-			if(time1 == -1) {
-				time1 = data.getGazeTimeSec();
-			}else {
-				time1 = data.getGazeTimeSec();
-			}
 			/*
 			 * If current data is the first point of fixation verification
 			 */
@@ -114,7 +102,6 @@ public class EyeGazeRetrieveData {
 					/*
 					 * Empty the previous list and create a new possible fixation point
 					 */
-					createFixationIndexModel(fixationList);
 					model = convertEyeGazeDataToFixation(data);
 					fixationList = new ArrayList<FixationModel>();
 					fixationList.add(model);
@@ -144,53 +131,18 @@ public class EyeGazeRetrieveData {
 		newFix.setFixationIndex(currentIndex);
 		return newFix;
 	}
-	
-	private static void createFixationIndexModel(List<FixationModel> fixationList) {
-		FixationIndex index = new FixationIndex();
-		index.setFixationIndex(currentIndex);
-		
-		FixationModel model = fixationList.get(0);
-		index.setxPos(model.getxPosition());
-		index.setyPos(model.getyPosition());
-		index.setFixationDuration(fixationList.size());
-		//index.setFixationStartIndex(receivedDataSize);
-		
-		indexInfo.add(index);
-	}
-	
+
 	/*
-	 * TODO
-	 * Maybe useless
-	 * just leave here for the future
+	 * Write the fixation log when application exits.
+	 * By calling the verify fixtaion function from JNI
 	 */
-	public static void receivefixationdata(FixationIndex fixation) {
-		if(fixation != null && fixation.getFixationIndex() != -1) {
-			 System.out.println("data ypos" + fixation.getyPos());
-			 
-		}else {
-			System.out.println("DID NOT receive data");
-		}
-	}
-	
 	public static void writeFixationDataLog() {
 		System.out.println("received raw data size:start writing log" + rawData.size());
 		EyeGazeData[] rawDataArray = new EyeGazeData[rawData.size()];
 		for(int i=0; i< rawData.size(); i++) {
 			rawDataArray[i] = rawData.get(i);
-			System.out.println(i+ "isVectorfound" + rawData.get(i).isGazeVectorFound());
-			System.out.println(i+ "iXGaze" + rawData.get(i).getiIGaze());
-			System.out.println(i+ "iYGaze" + rawData.get(i).getiJGaze());
-			System.out.println(i+ "pupilRadius" + rawData.get(i).getPupilRadiusMm());
-			
-			//System.out.println("isVectorfound" + rawData.get(i).isGazeVectorFound());
 		}
-		//System.out.println("received fixation data size:start writing log" + indexInfo.size());
-		FixationIndex[] indexArray = new FixationIndex[indexInfo.size()];
-		for(int i=0; i< indexInfo.size(); i++) {
-			indexArray[i] = indexInfo.get(i);
-		}
-		
-		//EyeGazeJNI.getInstance().VerifyFixation(rawDataArray, 1, indexArray);
+		EyeGazeJNI.getInstance().VerifyFixation(rawDataArray);
 	}
 
 }
