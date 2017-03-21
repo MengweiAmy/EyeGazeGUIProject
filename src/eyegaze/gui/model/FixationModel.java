@@ -17,9 +17,19 @@ public class FixationModel {
 	
 	private float pupilDiam;
 	
+	private float xEyeballMm;
+	
+	private float yEyeballMm;
+	
+	private float focusOffsetMm;
+	
+	private float focusRangeMm;
+	
 	private int iSaccadeDurationDelayed;
 	
 	private int iFixDurationDelayed;
+	
+	private double gazeTime;
 
 	public int getFixationIndex() {
 		return fixationIndex;
@@ -77,6 +87,54 @@ public class FixationModel {
 		this.iFixDurationDelayed = iFixDurationDelayed;
 	}
 	
+	public static int getOffset() {
+		return offset;
+	}
+
+	public static void setOffset(int offset) {
+		FixationModel.offset = offset;
+	}
+
+	public double getGazeTime() {
+		return gazeTime;
+	}
+
+	public void setGazeTime(double gazeTime) {
+		this.gazeTime = gazeTime;
+	}
+
+	public float getxEyeballMm() {
+		return xEyeballMm;
+	}
+
+	public void setxEyeballMm(float xEyeballMm) {
+		this.xEyeballMm = xEyeballMm;
+	}
+
+	public float getyEyeballMm() {
+		return yEyeballMm;
+	}
+
+	public void setyEyeballMm(float yEyeballMm) {
+		this.yEyeballMm = yEyeballMm;
+	}
+
+	public float getFocusOffsetMm() {
+		return focusOffsetMm;
+	}
+
+	public void setFocusOffsetMm(float focusOffsetMm) {
+		this.focusOffsetMm = focusOffsetMm;
+	}
+
+	public float getFocusRangeMm() {
+		return focusRangeMm;
+	}
+
+	public void setFocusRangeMm(float focusRangeMm) {
+		this.focusRangeMm = focusRangeMm;
+	}
+
 	/*
 	 * Verify if it is the same fixation
 	 */

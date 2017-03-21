@@ -18,7 +18,8 @@ public class MouseControlService {
 			for(int i=0;i<datalist.size();i++) {
 				dataArray[i] = datalist.get(i);
 			}
-			int result = EyeGazeJNI.getInstance().VerifyFixation(dataArray);
+			
+			int result = EyeGazeJNI.getInstance().VerifyFixation(dataArray,0, null);
 			System.out.println("GET DIXATION LOGGED DATA"+result);
 		}
 	}

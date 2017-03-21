@@ -35,7 +35,8 @@ public class EyeGazeJNI {
 	   public native int EyeGazeLogStop();
 	   
 	   //Analysis the fixation data based on existed log
-	   public native int VerifyFixation(EyeGazeData[] gazeDatalist);
+	   //If writelog parameter is 1, then write the fixation log
+	   public native int VerifyFixation(EyeGazeData[] gazeDatalist, int writelog,FixationIndex[] fixationData);
 	   
 	   //Manually stop data collection
 	   //It is necessary to be called before shut down the device

@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
@@ -49,6 +51,7 @@ import eyegaze.gui.control.AnalysisGazeLog;
 import eyegaze.gui.control.MouseControlService;
 import eyegaze.gui.model.KeyBt;
 import eyegaze.gui.model.Sample;
+import eyegaze.jni.EyeGazeRetrieveData;
 
 /**
  * If using pure application mode, Please comment three lines of code
@@ -101,6 +104,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	RetrieveDataThread retriThread;
 	boolean isThreadStarted = false;
+	private Map<JButton, Timer> btnTimerMap = new HashMap<JButton, Timer>();
 	
 	private static SoftKeyBoardMain softKeyboard;
 	
@@ -110,6 +114,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private int currentLayer = 3;
 	
 	Keyboard keyboardLayerPanel;
+	
+	private Timer timer;
+	
+	boolean hasPerformClick;
 	
 	public static SoftKeyBoardMain getInstance() {
 		if(softKeyboard == null) {
@@ -201,6 +209,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                 	if(controlType == "Mouse Control"){
                 		MouseControlService service = new MouseControlService();
                 		service.verifyFixtionData(AnalysisGazeLog.getInstance().getEyeGazeData());
+                	}else if(controlType.equals("Gaze Control")) {
+                		//Write fixation data into log file
+                		EyeGazeRetrieveData.writeFixationDataLog();
                 	}
                 	System.exit(0);
                 }
@@ -212,6 +223,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	    this.setVisible(true);
 	    if(controlType == "Gaze Control"){
 		    //startGazeControl();
+	    	initilizeTimerForEachButton();
 	    }
     }
     
@@ -338,18 +350,62 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     
     //Based on the x,y axis to analyse current button
     public String getKeyByPosition(int x, int y) {
+    	if(timer != null) {
+        	timer.stop();
+    	}
+    	hasPerformClick = false;
+    	System.out.println("Request to click button in X:" + x);
+    	System.out.println("Request to click button in Y:" + y);
     	int realY = y- p1.getComponent(1).getY();
     	for(int i=0;i<keyboardSet.length;i++) {
     		KeyBt key = keyboardSet[i];
     		if(key.getX() < x && x < key.getX() + key.getW()) {
     			if(key.getY() < realY && realY < key.getY() + key.getH()) {
-    				System.out.println("jbtn"+jbtnList[i].getText());
-    				jbtnList[i].doClick();
+    				System.out.println("jbtn: "+jbtnList[i].getText());
+    				
+    				JButton jt = jbtnList[i];
+    				System.out.println("Button from list:" + jt.getText());
+					JProgressBar proBar = progressBarList[i];
+					if(key.getLabel().equals(jt.getText())) {
+						if(currentIndex != -1) {
+							proBar.setValue(0);//Restart the circle count value from 0
+							keyboardLayerPanel.setLayer(jbtnList[currentIndex], currentLayer++);
+						}
+						currentIndex = i;
+						keyboardLayerPanel.setLayer(progressBarList[i], currentLayer++);
+						
+						timer = btnTimerMap.get(jt);
+						timer.restart();
+					}
+					
+    				//jbtnList[i].doClick();
     				return key.getLabel();
     			}
     		}
     	}
     	return "";
+    }
+    
+    private void initilizeTimerForEachButton() {
+    	for(int i=0;i < jbtnList.length; i++) {
+    		JProgressBar proBar = progressBarList[i];
+    		JButton jbtn = jbtnList[i];
+    		
+    		Timer timer = new Timer(12, e -> {
+			      int iv = Math.min(100, proBar.getValue() + 1);
+			      proBar.setValue(iv);
+			      if(proBar.getValue() == 100) {
+			    	  if(!hasPerformClick) {
+			    		  jbtn.doClick();
+			    		  System.out.println("Calling doclick function by" + jbtnList[currentIndex].getText());
+			    		  hasPerformClick = true;
+			    		  //The button layer back to top again
+			    		  keyboardLayerPanel.setLayer(jbtn, currentLayer++);
+			    	  }
+				  }
+			});
+    		btnTimerMap.put(jbtn, timer);
+    	}
     }
     
     public void initilizeOutput() {
@@ -395,32 +451,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		char c = (s.toLowerCase()).charAt(0);
 		System.out.println(s+" is clicked");
 		
-		if(controlType.equals("Gaze Control")) {
-			for(int i=0;i < jbtnList.length; i++) {
-				JButton jt = jbtnList[i];
-				JProgressBar proBar = progressBarList[i];
-				if(s.equals(jt.getText())) {
-					System.out.println("current click btn: " + s);
-					System.out.println("current index: " + currentIndex);
-					System.out.println("current i: " + i);
-					System.out.println("current layer: " + currentLayer);
-					if(currentIndex != -1) {
-						proBar.setValue(0);//Restart the circle count value from 0
-						keyboardLayerPanel.setLayer(jbtnList[currentIndex], currentLayer++);
-					}
-					currentIndex = i;
-					keyboardLayerPanel.setLayer(progressBarList[i], currentLayer++);
-					
-					Timer timer = new Timer(50, e -> {
-					      int iv = Math.min(100, proBar.getValue() + 1);
-					      proBar.setValue(iv);
-					});
-					timer.restart();
-					break;
-				}
-			}
-		}
-
 		int x = jb.getX();
 		//Add the offset of jPanel. The raw Y axis is the position based on keyboard panel
 		//Should add the height of text area, then it is the real position of the button
