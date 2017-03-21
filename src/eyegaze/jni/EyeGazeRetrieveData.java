@@ -87,10 +87,10 @@ public class EyeGazeRetrieveData {
 					fixationList.add(nextMo);
 					// if the current list size is larger than 6, then marked as one fixation
 					if(fixationList.size() >= miniFixationSize) {
-						System.out.println("Detecting one fixation: fixation size :" + fixationList.size());
-						System.out.println("Detecting one fixation: Raw Position X :" +model.getxPosition() + "Raw Position Y :" +model.getyPosition());
+						//System.out.println("Detecting one fixation: fixation size :" + fixationList.size());
+						//System.out.println("Detecting one fixation: Raw Position X :" +model.getxPosition() + "Raw Position Y :" +model.getyPosition());
 						
-						System.out.println("Detecting one fixation: New data Position X :" +nextMo.getxPosition() + "New data Position Y :" +nextMo.getyPosition());
+						//System.out.println("Detecting one fixation: New data Position X :" +nextMo.getxPosition() + "New data Position Y :" +nextMo.getyPosition());
 						//If it is the first time to reach 6 gaze points, notify the application,
 						//Otherwise just add the list
 						if(!isNotified) {
@@ -121,7 +121,7 @@ public class EyeGazeRetrieveData {
 					isNotified = false;
 				}
 			}
-			System.out.println("Detecting one fixation data: Current fixation Index :" + currentIndex);
+			//System.out.println("Detecting one fixation data: Current fixation Index :" + currentIndex);
 		}else {
 			System.out.println("DID NOT receive data");
 		}
@@ -177,16 +177,20 @@ public class EyeGazeRetrieveData {
 		EyeGazeData[] rawDataArray = new EyeGazeData[rawData.size()];
 		for(int i=0; i< rawData.size(); i++) {
 			rawDataArray[i] = rawData.get(i);
-			System.out.println("isVectorfound" + rawData.get(i).isGazeVectorFound());
+			System.out.println(i+ "isVectorfound" + rawData.get(i).isGazeVectorFound());
+			System.out.println(i+ "iXGaze" + rawData.get(i).getiIGaze());
+			System.out.println(i+ "iYGaze" + rawData.get(i).getiJGaze());
+			System.out.println(i+ "pupilRadius" + rawData.get(i).getPupilRadiusMm());
+			
 			//System.out.println("isVectorfound" + rawData.get(i).isGazeVectorFound());
 		}
-		System.out.println("received fixation data size:start writing log" + indexInfo.size());
+		//System.out.println("received fixation data size:start writing log" + indexInfo.size());
 		FixationIndex[] indexArray = new FixationIndex[indexInfo.size()];
 		for(int i=0; i< indexInfo.size(); i++) {
 			indexArray[i] = indexInfo.get(i);
 		}
 		
-		EyeGazeJNI.getInstance().VerifyFixation(rawDataArray, 1, indexArray);
+		//EyeGazeJNI.getInstance().VerifyFixation(rawDataArray, 1, indexArray);
 	}
 
 }

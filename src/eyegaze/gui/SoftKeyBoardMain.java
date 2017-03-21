@@ -138,8 +138,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	 * Every time comment these two lines if don not need device when debugging
     	 */
     	
-    	//EyeDeviceControl.getInstance().initializeDevice();
-        //isDeviceStarted = true;
+    	EyeDeviceControl.getInstance().initializeDevice();
+        isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
@@ -222,7 +222,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	    this.setVisible(true);
 	    if(controlType == "Gaze Control"){
-		    //startGazeControl();
+		    startGazeControl();
 	    	initilizeTimerForEachButton();
 	    }
     }
@@ -350,12 +350,12 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     
     //Based on the x,y axis to analyse current button
     public String getKeyByPosition(int x, int y) {
+    	//If current timer is not null
+    	//Stop the timer and get a new timer from timer Map
     	if(timer != null) {
         	timer.stop();
     	}
     	hasPerformClick = false;
-    	System.out.println("Request to click button in X:" + x);
-    	System.out.println("Request to click button in Y:" + y);
     	int realY = y- p1.getComponent(1).getY();
     	for(int i=0;i<keyboardSet.length;i++) {
     		KeyBt key = keyboardSet[i];
@@ -386,6 +386,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	return "";
     }
     
+    /**
+     * Initialize a timer for each progress bar in order to fix the issue that
+     * the first button always be clicked
+     */
     private void initilizeTimerForEachButton() {
     	for(int i=0;i < jbtnList.length; i++) {
     		JProgressBar proBar = progressBarList[i];
