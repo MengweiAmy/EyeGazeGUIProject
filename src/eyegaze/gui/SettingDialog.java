@@ -92,6 +92,7 @@ public class SettingDialog extends JFrame implements ActionListener{
 	         }else if(i==3) {
 	        	 currTypes = dwellList;
 	        	 dwellCombo = new JComboBox(currTypes);
+	        	 dwellCombo.setSelectedIndex(2);
 	        	 l.setLabelFor(dwellCombo);
 		         p.add(dwellCombo);
 	         }
