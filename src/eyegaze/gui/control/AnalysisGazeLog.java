@@ -70,10 +70,8 @@ public class AnalysisGazeLog {
 					if (isRawAnaStarted) {
 						if(count == 0) {
 							addNewGazeData(valus);
-							System.out.println(out);
 						}else if(Integer.valueOf(valus[0]) != data.get(count-1).getAppMarkCount()) {
 							addNewGazeData(valus);
-							System.out.println(out);
 						}
 					}
 				}
@@ -144,7 +142,6 @@ public class AnalysisGazeLog {
 						isFixaRealData = true;
 					}
 					if(isFixationAnaStarted && isFixaRealData) {
-						System.out.println(out);
 						FixtionData fix = new FixtionData();
 						fix.setiFixtionIndex(Integer.valueOf(valus[0]));
 						fix.setxFixDelayed(Float.valueOf(valus[1]));

@@ -42,5 +42,8 @@ public class EyeGazeJNI {
 	   //It is necessary to be called before shut down the device
 	   //Otherwise the device cannot be shutdown correctly
 	   public native void StopDataCollection();
+	   
+	   //Initilise the eye gaze image function
+	   public native void EyeGazeImageDisplay();
 
 }

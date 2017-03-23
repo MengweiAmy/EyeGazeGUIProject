@@ -41,11 +41,13 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private JComboBox fixationOffsetCombo;
 	
-	String[] sampleList = {"20","50","75","100","150","200"};
+	private JComboBox dwellCombo;
 	
-	String[] offsetList = {"30","50","65","75","100"};
+	private String[] sampleList = {"20","50","75","100","150","200"};
 	
-	String[] dwellList = {"50", "100","200","300","500"};
+	private String[] offsetList = {"30","50","65","75","100"};
+	
+	private String[] dwellList = {"50ms", "100ms","200ms","250ms","300ms","500ms"};
 
 	/**
 	 * 
@@ -68,19 +70,31 @@ public class SettingDialog extends JFrame implements ActionListener{
 
 	     //Create and populate the panel.
 	     JPanel p = new JPanel(new SpringLayout());
+	     String[] currTypes = null;
 	     for (int i = 0; i < numPairs; i++) {
 	         JLabel l = new JLabel(labels[i], JLabel.TRAILING);
 	         p.add(l);
-	         if(i==1) {
-	        	 types = sampleList;
+	         if(i ==0) {
+	        	 currTypes = types;
+	        	 controlTypeCombo = new JComboBox(currTypes);
+	        	 l.setLabelFor(controlTypeCombo);
+		         p.add(controlTypeCombo);
+	         }else if(i==1) {
+	        	 currTypes = sampleList;
+	        	 fixationSampleCombo = new JComboBox(currTypes);
+	        	 l.setLabelFor(fixationSampleCombo);
+		         p.add(fixationSampleCombo);
 	         }else if(i==2){
-	        	 types = offsetList;
+	        	 currTypes = offsetList;
+	        	 fixationOffsetCombo = new JComboBox(currTypes);
+	        	 l.setLabelFor(fixationOffsetCombo);
+		         p.add(fixationOffsetCombo);
 	         }else if(i==3) {
-	        	 types = dwellList;
+	        	 currTypes = dwellList;
+	        	 dwellCombo = new JComboBox(currTypes);
+	        	 l.setLabelFor(dwellCombo);
+		         p.add(dwellCombo);
 	         }
-	         JComboBox textField = new JComboBox(types);
-	         l.setLabelFor(textField);
-	         p.add(textField);
 	     }
 
 	     //Lay out the panel.
@@ -92,41 +106,12 @@ public class SettingDialog extends JFrame implements ActionListener{
 	     JPanel text1Panel = new JPanel();
 		 text1Panel.setLayout(new BoxLayout(text1Panel, BoxLayout.PAGE_AXIS));
 		 text1Panel.setBorder(new TitledBorder(new EtchedBorder(), "Configuration"));
-		 
-		 JLabel label1 = new JLabel("Select Control Type:");
-		 
-		 controlTypeCombo = new JComboBox(types);
-		 controlTypeCombo.setSelectedIndex(0);
-		 controlTypeCombo.addActionListener(this);
-		 controlTypeCombo.setPreferredSize(new Dimension(200,30));
-		 
-		 JLabel label2 = new JLabel("Select Minimum fixation samples:");
-		 fixationSampleCombo = new JComboBox(sampleList);
-		 fixationSampleCombo.setSelectedIndex(0);
-		 fixationSampleCombo.addActionListener(this);
-		 fixationSampleCombo.setPreferredSize(new Dimension(200,30));
-		 
-		 JLabel label3 = new JLabel("Select Minimum fixation offset:");
-		 fixationOffsetCombo = new JComboBox(sampleList);
-		 fixationOffsetCombo.setSelectedIndex(0);
-		 fixationOffsetCombo.addActionListener(this);
-		 fixationOffsetCombo.setPreferredSize(new Dimension(200,30));
-		 
-		 
+
 		 JPanel text2Panel = new JPanel();
 		 text2Panel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		 
 		 JButton b=new JButton("OK");  
 		 b.setBounds(50,100,95,30);  
-			
-		 text1Panel.add(label1,BorderLayout.CENTER);
-		 text1Panel.add(controlTypeCombo,BorderLayout.CENTER);
-		 
-		 text1Panel.add(label2,BorderLayout.CENTER);
-		 text1Panel.add(fixationSampleCombo,BorderLayout.CENTER);
-		 
-		 text1Panel.add(label3,BorderLayout.CENTER);
-		 text1Panel.add(fixationOffsetCombo,BorderLayout.CENTER);
 		 
 		 text2Panel.add(b,BorderLayout.CENTER);
 		 
@@ -141,6 +126,10 @@ public class SettingDialog extends JFrame implements ActionListener{
 			    @Override
 			    public void actionPerformed(ActionEvent event) {
 			        String controlTye = (String) controlTypeCombo.getSelectedItem();
+			        
+			        String dwellTime = (String) dwellCombo.getSelectedItem();
+			        String time = dwellTime.substring(0, dwellTime.length()-2);
+			        
 			        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			            public void run() {
 			            	if(controlTye.equals("Gaze Control")) {
@@ -155,8 +144,9 @@ public class SettingDialog extends JFrame implements ActionListener{
 			            	/*
 			            	 * Set controlType before start the application
 			            	 */
-			            	//SoftKeyBoardMain.getInstance().setControlType(controlTye);
-			            	//SoftKeyBoardMain.getInstance().createAndShowGUI(); 
+			            	SoftKeyBoardMain.getInstance().setControlType(controlTye);
+			            	SoftKeyBoardMain.getInstance().setDwellTime(time);
+			            	SoftKeyBoardMain.getInstance().createAndShowGUI(); 
 			            }
 			        });
 			    }
@@ -171,26 +161,13 @@ public class SettingDialog extends JFrame implements ActionListener{
 	                        "Exit Confirmation", JOptionPane.YES_NO_OPTION,
 	                        JOptionPane.QUESTION_MESSAGE, null, null, null);
 	                if (confirm == JOptionPane.YES_OPTION) {
-//	                    eyeGaze.EyeGazeLogStop();
-//	                    eyeGaze.EyeGazeShutDown();
 	                    System.exit(0);
 	                }
 	            }
 	        };
-	        this.addWindowListener(exitListener);
-		    this.setExtendedState(JFrame.NORMAL);
-		    this.setVisible(true);
-	}
-	
-	public static void main(String[] arg0) {
-		
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-            	SettingDialog soft = new SettingDialog();
-            	soft.createDialog();
-            }
-        });
-
+	      this.addWindowListener(exitListener);
+		  this.setExtendedState(JFrame.NORMAL);
+		  this.setVisible(true);
 	}
 
 	@Override

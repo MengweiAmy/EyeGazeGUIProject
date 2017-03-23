@@ -110,4 +110,11 @@ public class EyeDeviceControl {
 	public void stopDataCollection() {
 		eyeGaze.StopDataCollection();
 	}
+	
+	/*
+	 * The image will be displayed on the right corner of the screen
+	 */
+	public void displayEyeImages() {
+		eyeGaze.EyeGazeImageDisplay();
+	}
 }

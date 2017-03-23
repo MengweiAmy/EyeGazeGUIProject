@@ -9,7 +9,11 @@ import eyegaze.gui.ProgressCircleUI;
 
 public class CircularProgressTest {
 	
-	public JComponent makeUI() {
+	private int delay;
+	
+	private int offset;
+	
+	public JComponent makeUI(String dwellTime) {
 	    JProgressBar progress = new JProgressBar();
 	    // use JProgressBar#setUI(...) method
 	    progress.setUI(new ProgressCircleUI());
@@ -18,8 +22,16 @@ public class CircularProgressTest {
 	    progress.setFont(progress.getFont().deriveFont(24f));
 	    progress.setForeground(Color.ORANGE);
 
-	    (new Timer(50, e -> {
-	      int iv = Math.min(100, progress.getValue() + 1);
+	    if(Integer.valueOf(dwellTime) <= 100) {
+			delay = Integer.valueOf(dwellTime)/10;
+			offset = 10;
+		}else {
+			delay = Integer.valueOf(dwellTime)/100;
+			offset = 1;
+		}
+	    
+	    (new Timer(delay, e -> {
+	      int iv = Math.min(100, progress.getValue() + offset);
 	      progress.setValue(iv);
 	    })).start();
 
@@ -32,7 +44,7 @@ public class CircularProgressTest {
 	      JFrame f = new JFrame();
 	      f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	      JPanel newPanel = new JPanel(new CardLayout());
-	      newPanel.add(new CircularProgressTest().makeUI());
+	      newPanel.add(new CircularProgressTest().makeUI("500"));
 	      
 	      //f.getContentPane().add(new CircularProgressTest().makeUI());
 	      f.setSize(320, 240);

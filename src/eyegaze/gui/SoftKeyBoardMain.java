@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Panel;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,6 +43,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.Timer;
+import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -98,12 +100,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private int count; // count keystrokes per phrase
 	private Random r = new Random();//generate random index to display random sentence from phrase file
 	
-	private boolean isLogstared = false;
-	private boolean isDeviceStarted = false;
-	private String controlType;
-	
-	RetrieveDataThread retriThread;
-	boolean isThreadStarted = false;
+
 	private Map<JButton, Timer> btnTimerMap = new HashMap<JButton, Timer>();
 	
 	private static SoftKeyBoardMain softKeyboard;
@@ -118,6 +115,22 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private Timer timer;
 	
 	boolean hasPerformClick;
+	
+	private int delay;
+	private int offset;
+	
+	/************************************System Parameters **************************************************/
+	private String controlType;
+	private String dwellTime;
+	
+	/************************************Device Parameters **************************************************/
+	private boolean isLogstared = false;
+	private boolean isDeviceStarted = false;
+
+	RetrieveDataThread retriThread;
+	boolean isThreadStarted = false;
+	
+	
 	
 	public static SoftKeyBoardMain getInstance() {
 		if(softKeyboard == null) {
@@ -214,6 +227,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                 		EyeGazeRetrieveData.writeFixationDataLog();
                 	}
                 	System.exit(0);
+                }else{
+                	System.out.println("DO NOT close the window");
                 }
             }
         };
@@ -221,6 +236,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
         this.addWindowListener(exitListener);
 	    this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	    this.setVisible(true);
+	    /*
+	     * Add this line to avoid closing when press no button
+	     */
+	    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	    if(controlType == "Gaze Control"){
 		    startGazeControl();
 	    	initilizeTimerForEachButton();
@@ -268,6 +287,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		text2.setText(targetPhrase);
 		
 		// layout components
+		JPanel upper = new JPanel(new BorderLayout());
 		JPanel p1 = new JPanel();
 		p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
 		p1.add(Box.createRigidArea(new Dimension(100, 30)));
@@ -276,11 +296,14 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		p1.add(text2Panel);
 		p1.add(Box.createRigidArea(new Dimension(100, 30)));
 		
+		upper.add(p1,BorderLayout.LINE_START);
+		upper.add(new Panel(), BorderLayout.LINE_END);
+		
 		JPanel keyboardPanel = new JPanel();
 		keyboardPanel.add(createKeyboard());
 		
 		JPanel p = new JPanel(new BorderLayout());
-		p.add(p1, "North");
+		p.add(upper, "North");
 		p.add(keyboardPanel, "Center");
 		
 		return p;
@@ -394,9 +417,16 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	for(int i=0;i < jbtnList.length; i++) {
     		JProgressBar proBar = progressBarList[i];
     		JButton jbtn = jbtnList[i];
-    		
-    		Timer timer = new Timer(12, e -> {
-			      int iv = Math.min(100, proBar.getValue() + 1);
+    		System.out.println("current select dwelltime" + dwellTime);
+    		if(Integer.valueOf(dwellTime) <= 100) {
+    			delay = Integer.valueOf(dwellTime)/50;
+    			offset = 2;
+    		}else {
+    			delay = Integer.valueOf(dwellTime)/100;
+    			offset = 1;
+    		}
+    		Timer timer = new Timer(delay, e -> {
+			      int iv = Math.min(100, proBar.getValue() + offset);
 			      proBar.setValue(iv);
 			      if(proBar.getValue() == 100) {
 			    	  if(!hasPerformClick) {
@@ -447,6 +477,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		System.out.println("Entered by gaze control");
 		if(!isLogstared && isDeviceStarted) {
 			EyeDeviceControl.getInstance().startLogging();
+			EyeDeviceControl.getInstance().displayEyeImages();
 			isLogstared = true;
 		}
 		
@@ -549,20 +580,18 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	public JPanel getMainPanel() {
 		return p1;
 	}
-	
-	/**
-	 * TODO
-	 * Figure out it later
-	 */
-	private void disableKeys() {
-		for(int i=0; i<keyboardSet.length;i++) {
-			KeyBt key = keyboardSet[i];
-			String label = key.getLabel();
-			text2.getInputMap().put(KeyStroke.getKeyStroke(label), "none");
-		}
-	}
     
+	/*
+	 * Get selected control type
+	 */
 	public void setControlType(String controlType) {
 		this.controlType = controlType;
+	}
+	
+	/*
+	 * Get dwell time settings
+	 */
+	public void setDwellTime(String dwellTime) {
+		this.dwellTime = dwellTime;
 	}
 }
