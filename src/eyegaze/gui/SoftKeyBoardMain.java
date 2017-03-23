@@ -41,7 +41,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
@@ -75,6 +74,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	private static final long serialVersionUID = 1L;
 	
+	private static SoftKeyBoardMain softKeyboard;
+	
+	/***********************************************Key board Parameters*********************************/
 	private Font BIG = new Font("monospaced", Font.BOLD, 24);
 	private Color BACKGROUND = new Color(254, 254, 218);
 	private Color FOREGROUND = new Color(11, 11, 109);
@@ -87,8 +89,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	private JTextField text1;
 	private JTextField text2;
-	
 	private BufferedWriter sd1File;
+	
+	/**************************************Load phrases parameters**************************************/
 	
 	private String[] phrases;
 	private String presentedPhrase; // presented phrase
@@ -99,11 +102,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private long t1, t2 , t3;
 	private int count; // count keystrokes per phrase
 	private Random r = new Random();//generate random index to display random sentence from phrase file
-	
-
-	private Map<JButton, Timer> btnTimerMap = new HashMap<JButton, Timer>();
-	
-	private static SoftKeyBoardMain softKeyboard;
+	private int finishCount = 0;
+	private int sentenceSize;
 	
 	/*************************************Progress bar parameter*********************************************/
 	private int currentIndex=-1;
@@ -115,13 +115,17 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private Timer timer;
 	
 	boolean hasPerformClick;
-	
+
+	private Map<JButton, Timer> btnTimerMap = new HashMap<JButton, Timer>();
 	private int delay;
 	private int offset;
+	
 	
 	/************************************System Parameters **************************************************/
 	private String controlType;
 	private String dwellTime;
+	private String blockNo;
+	
 	
 	/************************************Device Parameters **************************************************/
 	private boolean isLogstared = false;
@@ -240,7 +244,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	     * Add this line to avoid closing when press no button
 	     */
 	    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-	    if(controlType == "Gaze Control"){
+	    if(controlType == "Gaze Control" && isDeviceStarted){
 		    startGazeControl();
 	    	initilizeTimerForEachButton();
 	    }
@@ -340,9 +344,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	keyboardSet = qwertyKeyboard;
     	jbtnList = keyboardLayerPanel.getJButtonList();
     	progressBarList = keyboardLayerPanel.getProgressBarList();
-//    	JPanel keyboardPanel = new JPanel();
-//		keyboardPanel.add(keyboardLayerPanel);
-//		keyboardPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		
 		return keyboardLayerPanel;
     }
@@ -368,7 +369,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	}
     	
     	// present first phrase for input
-    	presentedPhrase = phrases[r.nextInt(phrases.length)];
+    	//presentedPhrase = phrases[r.nextInt(phrases.length)];
+    	presentedPhrase = phrases[Integer.valueOf(blockNo) * sentenceSize];
     }
     
     //Based on the x,y axis to analyse current button
@@ -450,7 +452,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
         SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy");
         System.out.println( sdf.format(cal.getTime()) );
 		//s1 = sdf.format(cal.getTime())+"-"+controlType+".dat";
-		s1 = "ClickInfo"+"-"+controlType+".dat";
+		s1 = "ClickInfo"+"-"+controlType+"_"+finishCount+".sd";
 		try
 		{
 			sd1File = new BufferedWriter(new FileWriter(s1));
@@ -474,7 +476,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent action) {
 		// TODO Auto-generated method stub
-		System.out.println("Entered by gaze control");
 		if(!isLogstared && isDeviceStarted) {
 			EyeDeviceControl.getInstance().startLogging();
 			EyeDeviceControl.getInstance().displayEyeImages();
@@ -484,7 +485,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		JButton jb = (JButton)action.getSource();
 		String s = jb.getText();
 		char c = (s.toLowerCase()).charAt(0);
-		System.out.println(s+" is clicked");
 		
 		int x = jb.getX();
 		//Add the offset of jPanel. The raw Y axis is the position based on keyboard panel
@@ -530,6 +530,12 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	}
 	
 	private void enterPressed() {
+		finishCount++;
+		if(finishCount == sentenceSize) {
+			JLabel thankyou = new JLabel("End of This Session. Thank you.");
+			thankyou.setFont(new Font("sansserif", Font.PLAIN, 16));
+			JOptionPane.showMessageDialog(this, thankyou);
+		}
 		initilizeOutput();
 		//TODO Finish current input and write the log
 		//Stop logging the eyegaze data if the eye tracker is started
@@ -554,10 +560,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 			System.err.println("ERROR WRITING TO DATA FILE!\n" + e);
 			System.exit(1);
 		}
-
-		JLabel thankyou = new JLabel("End of block. Thank you.");
-		thankyou.setFont(new Font("sansserif", Font.PLAIN, 16));
-		JOptionPane.showMessageDialog(this, thankyou);
+		
 		try
 		{
 			sd1File.close();
@@ -569,12 +572,17 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 
 		// prepare for next phrase
 	    samples = new Vector<Sample>();
-		presentedPhrase = phrases[r.nextInt(phrases.length)];
+	    
+	    //Increase the phrase every time click the enter
+	    int cout = Integer.valueOf(blockNo);
+		presentedPhrase = phrases[cout+finishCount];
+		
 		text1.setText(presentedPhrase);
 		targetPhrase = "";
 		text2.setText(targetPhrase);
 		t1 = 0;
 		count = 0;
+		
 	}
 	
 	public JPanel getMainPanel() {
@@ -593,5 +601,13 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	 */
 	public void setDwellTime(String dwellTime) {
 		this.dwellTime = dwellTime;
+	}
+	
+	public void setBlockNo(String block) {
+		this.blockNo = block;
+	}
+	
+	public void setSentenceSize(int size) {
+		this.sentenceSize = size;
 	}
 }

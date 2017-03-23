@@ -1,9 +1,5 @@
 package eyegaze.jni;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +18,7 @@ public class EyeGazeRetrieveData {
 	/*
 	 * 6 gaze data marked as one fixation
 	 */
-	private static int miniFixationSize = 50;
+	public static int miniFixationSize;
 	
 	/*
 	 * Current saved fixation data

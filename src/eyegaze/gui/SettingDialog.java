@@ -21,6 +21,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import eyegaze.gui.tools.SpringUtilities;
+import eyegaze.jni.EyeGazeRetrieveData;
 
 /**
  * Application entry to choose the control type : 
@@ -43,11 +44,17 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private JComboBox dwellCombo;
 	
-	private String[] sampleList = {"20","50","75","100","150","200"};
+	private JComboBox phraseBlockCombo;
+	
+	private JComboBox sentenSizeCombo;
+	
+	private String[] sampleList = {"20","30","40","50","75","100","150","200"};
 	
 	private String[] offsetList = {"30","50","65","75","100"};
 	
 	private String[] dwellList = {"50ms", "100ms","200ms","250ms","300ms","500ms"};
+	
+	private String[] sentenCeList = {"3","5","10","15"};
 
 	/**
 	 * 
@@ -62,7 +69,8 @@ public class SettingDialog extends JFrame implements ActionListener{
 	     frame.setLocationRelativeTo(null);
 	     frame.setTitle("Settings");
 	     
-	     String[] labels = {"Select Control Type:", "Select Minimum fixation samples:", "Select Minimum fixation offset:", "Select dwell time(millSec):"};
+	     String[] labels = {"Select Control Type:", "Select Minimum fixation samples:", "Select Minimum fixation offset:", "Select dwell time(millSec):"
+	    		 ,"Select Phrases block", "Select sentence size:"};
 	     
 	     String[] types = { "Mouse Control", "Gaze Control"};
 
@@ -87,6 +95,7 @@ public class SettingDialog extends JFrame implements ActionListener{
 	         }else if(i==2){
 	        	 currTypes = offsetList;
 	        	 fixationOffsetCombo = new JComboBox(currTypes);
+	        	 fixationOffsetCombo.setSelectedIndex(2);
 	        	 l.setLabelFor(fixationOffsetCombo);
 		         p.add(fixationOffsetCombo);
 	         }else if(i==3) {
@@ -95,6 +104,21 @@ public class SettingDialog extends JFrame implements ActionListener{
 	        	 dwellCombo.setSelectedIndex(2);
 	        	 l.setLabelFor(dwellCombo);
 		         p.add(dwellCombo);
+	         }else if(i==4) {
+	        	 currTypes = new String[20];
+	        	 for(int j=0; j< 20; j++) {
+	        		 currTypes[j] = ""+j;
+	        	 }
+	        	 phraseBlockCombo = new JComboBox(currTypes);
+	        	 phraseBlockCombo.setSelectedIndex(0);
+	        	 l.setLabelFor(phraseBlockCombo);
+		         p.add(phraseBlockCombo);
+	         }else if(i==5) {
+	        	 currTypes = sentenCeList;
+	        	 sentenSizeCombo = new JComboBox(sentenCeList);
+	        	 sentenSizeCombo.setSelectedIndex(0);
+	        	 l.setLabelFor(sentenSizeCombo);
+		         p.add(sentenSizeCombo);
 	         }
 	     }
 
@@ -131,6 +155,12 @@ public class SettingDialog extends JFrame implements ActionListener{
 			        String dwellTime = (String) dwellCombo.getSelectedItem();
 			        String time = dwellTime.substring(0, dwellTime.length()-2);
 			        
+			        String blockNo = (String) phraseBlockCombo.getSelectedItem();
+			        
+			        String sentenSiz = (String)sentenSizeCombo.getSelectedItem();
+			        
+			        String fixationSiz = (String)fixationSampleCombo.getSelectedItem();
+			        
 			        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			            public void run() {
 			            	if(controlTye.equals("Gaze Control")) {
@@ -147,7 +177,14 @@ public class SettingDialog extends JFrame implements ActionListener{
 			            	 */
 			            	SoftKeyBoardMain.getInstance().setControlType(controlTye);
 			            	SoftKeyBoardMain.getInstance().setDwellTime(time);
+			            	SoftKeyBoardMain.getInstance().setSentenceSize(Integer.valueOf(sentenSiz));
+			            	SoftKeyBoardMain.getInstance().setBlockNo(blockNo);
 			            	SoftKeyBoardMain.getInstance().createAndShowGUI(); 
+			            	
+			            	/*
+			            	 * Set retrieve data parameters
+			            	 */
+			            	EyeGazeRetrieveData.miniFixationSize = Integer.valueOf(fixationSiz);
 			            }
 			        });
 			    }
