@@ -115,6 +115,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private Timer timer;
 	
 	boolean hasPerformClick;
+	boolean isTimerStop=false;
 
 	private Map<JButton, Timer> btnTimerMap = new HashMap<JButton, Timer>();
 	private int delay;
@@ -208,9 +209,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                 	}
                 	try {
                 		/**
-                		 * Try to sleep for 3 seconds and the shut down the device
+                		 * Try to sleep for seconds and the shut down the device
                 		 */
-						Thread.sleep(500);
+						Thread.sleep(300);
 						if(isDeviceStarted) {
 	                    	EyeDeviceControl.getInstance().stopLogging();
 	                    	EyeDeviceControl.getInstance().shutdonwDevice();
@@ -379,6 +380,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	//Stop the timer and get a new timer from timer Map
     	if(timer != null) {
         	timer.stop();
+        	System.out.println("current time is stopped");
     	}
     	hasPerformClick = false;
     	int realY = y- p1.getComponent(1).getY();
@@ -401,6 +403,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 						
 						timer = btnTimerMap.get(jt);
 						timer.restart();
+						System.out.println("timer is started!"+ key.getLabel() + " :" + System.currentTimeMillis());
 					}
 					
     				//jbtnList[i].doClick();
@@ -409,6 +412,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     		}
     	}
     	return "";
+    }
+    
+    public void stopProgressBarTimer() {
+    	timer.stop();
     }
     
     /**
@@ -421,24 +428,27 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     		JButton jbtn = jbtnList[i];
     		System.out.println("current select dwelltime" + dwellTime);
     		if(Integer.valueOf(dwellTime) <= 100) {
+    			delay = Integer.valueOf(dwellTime)/25;
+    			offset = 5;
+    		}else {
     			delay = Integer.valueOf(dwellTime)/50;
     			offset = 2;
-    		}else {
-    			delay = Integer.valueOf(dwellTime)/100;
-    			offset = 1;
     		}
     		Timer timer = new Timer(delay, e -> {
-			      int iv = Math.min(100, proBar.getValue() + offset);
-			      proBar.setValue(iv);
-			      if(proBar.getValue() == 100) {
-			    	  if(!hasPerformClick) {
-			    		  jbtn.doClick();
-			    		  System.out.println("Calling doclick function by" + jbtnList[currentIndex].getText());
-			    		  hasPerformClick = true;
-			    		  //The button layer back to top again
-			    		  keyboardLayerPanel.setLayer(jbtn, currentLayer++);
-			    	  }
-				  }
+    			if(!isTimerStop) {
+    				int iv = Math.min(100, proBar.getValue() + offset);
+    				proBar.setValue(iv);
+  			      	if(proBar.getValue() == 100) {
+  			      		System.out.println("timer is stoped!"+ jbtnList[currentIndex].getText() + " :" + System.currentTimeMillis());
+  			      		if(!hasPerformClick) {
+  			      			jbtn.doClick();
+  			      			System.out.println("Calling doclick function by" + jbtnList[currentIndex].getText());
+  			      			hasPerformClick = true;
+  			      			//The button layer back to top again
+  			      			keyboardLayerPanel.setLayer(jbtn, currentLayer++);
+  			      		}
+  			      	}
+    			}
 			});
     		btnTimerMap.put(jbtn, timer);
     	}
@@ -583,6 +593,12 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		t1 = 0;
 		count = 0;
 		
+	}
+	
+	private void writeClickLog() {
+		for (int i = 0; i < samples.size(); ++i) {
+			
+		}
 	}
 	
 	public JPanel getMainPanel() {

@@ -54,7 +54,7 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private String[] dwellList = {"50ms", "100ms","200ms","250ms","300ms","500ms"};
 	
-	private String[] sentenCeList = {"3","5","10","15"};
+	private String[] sentenCeList = {"1","3","5","10","15"};
 
 	/**
 	 * 
@@ -92,6 +92,7 @@ public class SettingDialog extends JFrame implements ActionListener{
 	        	 fixationSampleCombo = new JComboBox(currTypes);
 	        	 l.setLabelFor(fixationSampleCombo);
 		         p.add(fixationSampleCombo);
+		         fixationSampleCombo.setSelectedIndex(4);
 	         }else if(i==2){
 	        	 currTypes = offsetList;
 	        	 fixationOffsetCombo = new JComboBox(currTypes);
@@ -101,7 +102,7 @@ public class SettingDialog extends JFrame implements ActionListener{
 	         }else if(i==3) {
 	        	 currTypes = dwellList;
 	        	 dwellCombo = new JComboBox(currTypes);
-	        	 dwellCombo.setSelectedIndex(2);
+	        	 dwellCombo.setSelectedIndex(4);
 	        	 l.setLabelFor(dwellCombo);
 		         p.add(dwellCombo);
 	         }else if(i==4) {

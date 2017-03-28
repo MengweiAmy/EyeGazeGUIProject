@@ -20,6 +20,8 @@ public class EyeGazeRetrieveData {
 	 */
 	public static int miniFixationSize;
 	
+	public static int fixationStartMiniSize;
+	
 	/*
 	 * Current saved fixation data
 	 */
@@ -37,18 +39,29 @@ public class EyeGazeRetrieveData {
 	 */
 	static List<FixationModel> fixationList = null;
 	
-	/**
+	/** 
 	 * Receive gaze point data from eye gaze Device
 	 * It would be called in DLL
 	 * Every time C++ received one data, it would pass it to the function
 	 * @param data
 	 */
 	
-	// NOTE from 3-21 The offset between two data is 0.0083 secs
+	// NOTE on 3.21 The offset between two data is 0.0083 secs
 	public static void receivegazedaata(EyeGazeData data) {
 		if(data != null) {
 			//Used in written log
 			rawData.add(data);
+			
+			System.out.println("focus range:" + data.getFoucsRangeOffsetMm());
+			System.out.println("ext offset:" + data.getfLengExtOffsetMm());
+			/*
+			 * If current data has not found the eye data, then return
+			 */
+			System.out.println("isDataFound:"+data.isGazeVectorFound() );
+//			if(data.isGazeVectorFound() == 0) {
+//				System.out.println("DID not find eye data");
+//				return;
+//			}
 			
 			int pupilXPos = data.getiIGaze();
 			int pupilYPos = data.getiJGaze();		
@@ -70,11 +83,7 @@ public class EyeGazeRetrieveData {
 					FixationModel nextMo = convertEyeGazeDataToFixation(data);
 					fixationList.add(nextMo);
 					// if the current list size is larger than 6, then marked as one fixation
-					if(fixationList.size() >= miniFixationSize) {
-						//System.out.println("Detecting one fixation: fixation size :" + fixationList.size());
-						//System.out.println("Detecting one fixation: Raw Position X :" +model.getxPosition() + "Raw Position Y :" +model.getyPosition());
-						
-						//System.out.println("Detecting one fixation: New data Position X :" +nextMo.getxPosition() + "New data Position Y :" +nextMo.getyPosition());
+					if(fixationList.size() >= miniFixationSize/3) {
 						//If it is the first time to reach 6 gaze points, notify the application,
 						//Otherwise just add the list
 						if(!isNotified) {
@@ -91,10 +100,9 @@ public class EyeGazeRetrieveData {
 						//TODO
 						//Notify the application that we have recevied one fixation data
 						//And prepare to write into the dat file
-					}else {
-						
 					}
 				}else {
+					SoftKeyBoardMain.getInstance().stopProgressBarTimer();
 					/*
 					 * Empty the previous list and create a new possible fixation point
 					 */
@@ -120,8 +128,8 @@ public class EyeGazeRetrieveData {
 		newFix.setyPosition(data.getiJGaze());
 		newFix.setPupilDiam(data.getPupilRadiusMm());
 		newFix.setGazeTime(data.getGazeTimeSec());
-		newFix.setFocusOffsetMm(data.getFoucsRangeOffsetMm());
-		newFix.setFocusRangeMm(data.getFoucsRangeOffsetMm());
+		newFix.setFocusRangeMm(data.getFocusRangeImageTime());
+		newFix.setFocusRangeoffsetMm(data.getFoucsRangeOffsetMm());
 		newFix.setxEyeballMm(data.getfXEyeballOffsetMm());
 		newFix.setyEyeballMm(data.getfYEyeballOffsetMm());
 		newFix.setFixationIndex(currentIndex);

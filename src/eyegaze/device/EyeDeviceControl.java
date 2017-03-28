@@ -1,5 +1,6 @@
 package eyegaze.device;
 
+import eyegaze.jni.BtnData;
 import eyegaze.jni.EyeGazeData;
 import eyegaze.jni.EyeGazeJNI;
 
@@ -116,5 +117,9 @@ public class EyeDeviceControl {
 	 */
 	public void displayEyeImages() {
 		eyeGaze.EyeGazeImageDisplay();
+	}
+	
+	public void writeClickLogInfo(BtnData[] samples) {
+		eyeGaze.WriteClickLog(samples);
 	}
 }

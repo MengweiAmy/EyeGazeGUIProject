@@ -21,7 +21,7 @@ public class FixationModel {
 	
 	private float yEyeballMm;
 	
-	private float focusOffsetMm;
+	private float focusRangeoffsetMm;
 	
 	private float focusRangeMm;
 	
@@ -119,12 +119,12 @@ public class FixationModel {
 		this.yEyeballMm = yEyeballMm;
 	}
 
-	public float getFocusOffsetMm() {
-		return focusOffsetMm;
+	public float getFocusRangeoffsetMm() {
+		return focusRangeoffsetMm;
 	}
 
-	public void setFocusOffsetMm(float focusOffsetMm) {
-		this.focusOffsetMm = focusOffsetMm;
+	public void setFocusRangeoffsetMm(float focusRangeoffsetMm) {
+		this.focusRangeoffsetMm = focusRangeoffsetMm;
 	}
 
 	public float getFocusRangeMm() {
