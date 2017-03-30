@@ -38,11 +38,13 @@ public class AnalysisGazeLog {
 	private void loadFile() {
 		try {
 			FileReader file = new FileReader(new File("trace.dat"));
-			BufferedReader br = new BufferedReader(file);
-			String temp = br.readLine();
-			while (temp != null) {
-				temp = br.readLine();
-				analysisGazeData(temp);
+			if(file != null) {
+				BufferedReader br = new BufferedReader(file);
+				String temp = br.readLine();
+				while (temp != null) {
+					temp = br.readLine();
+					analysisGazeData(temp);
+				}
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -92,8 +94,8 @@ public class AnalysisGazeLog {
 		newD.setPupilRadiusMm(Float.valueOf(valus[4]));
 		newD.setfXEyeballOffsetMm(Float.valueOf(valus[5]));
 		newD.setfYEyeballOffsetMm(Float.valueOf(valus[6]));
-		newD.setfLengExtOffsetMm(Float.valueOf(valus[7]));
-		newD.setFoucsRangeOffsetMm(Float.valueOf(valus[8]));
+		newD.setFoucsRangeOffsetMm(Float.valueOf(valus[7]));
+		newD.setFocusRangeImageTime(Float.valueOf(valus[8]));
 		newD.setGazeTimeSec(Double.valueOf(valus[11]));
 		newD.setReportTimeSec(Double.valueOf(valus[12]));
 		count++;

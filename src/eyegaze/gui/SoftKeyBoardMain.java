@@ -20,8 +20,6 @@ import java.awt.event.WindowListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,12 +32,14 @@ import java.util.Vector;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
@@ -48,6 +48,7 @@ import javax.swing.border.TitledBorder;
 
 import eyegaze.device.EyeDeviceControl;
 import eyegaze.device.RetrieveDataThread;
+import eyegaze.device.WriteClickLog;
 import eyegaze.gui.control.AnalysisGazeLog;
 import eyegaze.gui.control.MouseControlService;
 import eyegaze.gui.model.KeyBt;
@@ -67,11 +68,6 @@ import eyegaze.jni.EyeGazeRetrieveData;
  */
 public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
-	/**
-	 * 
-	 */
-	
-	
 	private static final long serialVersionUID = 1L;
 	
 	private static SoftKeyBoardMain softKeyboard;
@@ -89,7 +85,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	private JTextField text1;
 	private JTextField text2;
-	private BufferedWriter sd1File;
 	
 	/**************************************Load phrases parameters**************************************/
 	
@@ -107,13 +102,11 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	/*************************************Progress bar parameter*********************************************/
 	private int currentIndex=-1;
-	
 	private int currentLayer = 3;
 	
 	Keyboard keyboardLayerPanel;
 	
 	private Timer timer;
-	
 	boolean hasPerformClick;
 	boolean isTimerStop=false;
 
@@ -135,7 +128,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	RetrieveDataThread retriThread;
 	boolean isThreadStarted = false;
 	
-	
+	/************************************Result Dialog Parameters********************************************/
+	JDialog resultsDialog;
+	JOptionPane resultsPane;
+	JTextArea resultsArea;
 	
 	public static SoftKeyBoardMain getInstance() {
 		if(softKeyboard == null) {
@@ -143,10 +139,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		}
 		return softKeyboard;
 	}
-	
-//	public SoftKeyBoardMain(String controlType) {
-//		this.controlType = controlType;
-//	}
 
     public void createAndShowGUI() {
     	
@@ -156,8 +148,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	 * Every time comment these two lines if don not need device when debugging
     	 */
     	
-    	EyeDeviceControl.getInstance().initializeDevice();
-        isDeviceStarted = true;
+    	//EyeDeviceControl.getInstance().initializeDevice();
+        //isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
@@ -176,13 +168,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
             glass.addMouseMotionListener(new MouseMotionAdapter() {});
             glass.addKeyListener(new KeyAdapter() {});
             
-            /*
-             * Make the keyboard visible
-             */
+            // Make the keyboard visible
             glass.setOpaque(false);
             // make sure the focus won't leave the glass pane
-            // glass.setFocusCycleRoot(true);  // 1.4
-            //padding.setNextFocusableComponent(padding);  // 1.3
             setGlassPane(glass);
         	glass.setVisible(true);
 	    }
@@ -221,9 +209,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 						e1.printStackTrace();
 					}
                 	
-                	//If current retrieve data thread is running
-                	//Terminate it when close the application window
-
+                	//Start analysis fixation data when close the application window
                 	if(controlType == "Mouse Control"){
                 		MouseControlService service = new MouseControlService();
                 		service.verifyFixtionData(AnalysisGazeLog.getInstance().getEyeGazeData());
@@ -249,8 +235,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		    startGazeControl();
 	    	initilizeTimerForEachButton();
 	    }
-    }
-    
+    }    
     
     public void startGazeControl() {
     	System.out.println("JAVA log: enter gaze control...");
@@ -259,6 +244,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	isThreadStarted = true;
     }
     
+    /*
+     * Build the text area
+     */
     public JPanel createTextField() {
     	
     	//Load phrases library
@@ -314,6 +302,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		return p;
     }
     
+    /*
+     * Build the keyboard pane
+     */
     public JLayeredPane createKeyboard() {
     	
     	//Adjust the key size with different screen size
@@ -349,6 +340,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		return keyboardLayerPanel;
     }
 	
+    /*
+     * Load phrases from the files
+     */
     public void loadPhrases() {
     	// ------------------
     	// initialize phrases
@@ -374,7 +368,33 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	presentedPhrase = phrases[Integer.valueOf(blockNo) * sentenceSize];
     }
     
-    //Based on the x,y axis to analyse current button
+    public void showResultDialog() {
+    	// prepare results dialog
+    	resultsArea = new JTextArea(13, 40);
+		resultsArea.setFont(new Font("sansserif", Font.PLAIN, 18));
+		resultsArea.setBackground((new JButton()).getBackground());
+		resultsPane = new JOptionPane(resultsArea, JOptionPane.INFORMATION_MESSAGE);
+		resultsPane.setFont(new Font("sansserif", Font.PLAIN, 18));
+		resultsDialog = resultsPane.createDialog(this, "Information");
+		
+		// build formated results to output to GUI
+		StringBuilder resultsString = new StringBuilder();
+		resultsString.append(" DATA COLLECTED:\n");
+		resultsString.append(String.format("   Presented:\t\t%s\n", presentedPhrase));
+		resultsString.append(String.format("   Transcribed:\t%s\n", targetPhrase));
+		resultsString.append(String.format("   Keystrokes:\t\t%d\n", count));
+		resultsString.append(String.format("   Characters:\t\t%d (%.1f words)\n", targetPhrase.length(), targetPhrase.length() / 5.0));
+		resultsString.append(String.format("   Time:\t\t%.2f s (%.2f minutes)\n", t2 / 1000.0, t2 / 1000.0 / 60.0));
+		//resultsString.append(String.format("   MSD:\t\t%d\n\n", msd));
+		resultsString.append(" PARTICIPANT PERFORMANCE:\n");
+		resultsString.append(String.format("   Entry Speed:\t%.2f wpm\n", wpm(targetPhrase, t2)));
+		//resultsString.append(String.format("   Error rate:\t\t%.2f%%\n", s1s2.getErrorRateNew()));
+		resultsString.append(String.format("   KSPC:\t\t%.4f\n", (double)count / targetPhrase.length()));
+		resultsArea.setText(resultsString.toString());
+		resultsDialog.setVisible(true);
+    }
+    
+    //Based on the x,y axis to analyze current button
     public String getKeyByPosition(int x, int y) {
     	//If current timer is not null
     	//Stop the timer and get a new timer from timer Map
@@ -405,8 +425,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 						timer.restart();
 						System.out.println("timer is started!"+ key.getLabel() + " :" + System.currentTimeMillis());
 					}
-					
-    				//jbtnList[i].doClick();
     				return key.getLabel();
     			}
     		}
@@ -414,6 +432,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	return "";
     }
     
+    /*
+     * If lost gaze fixation then stop the process bar running on the current button
+     */
     public void stopProgressBarTimer() {
     	timer.stop();
     }
@@ -452,35 +473,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 			});
     		btnTimerMap.put(jbtn, timer);
     	}
-    }
-    
-    public void initilizeOutput() {
-		
-		//Initialize the output files
-		String s1 = "";
-		Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy");
-        System.out.println( sdf.format(cal.getTime()) );
-		//s1 = sdf.format(cal.getTime())+"-"+controlType+".dat";
-		s1 = "ClickInfo"+"-"+controlType+"_"+finishCount+".sd";
-		try
-		{
-			sd1File = new BufferedWriter(new FileWriter(s1));
-		} catch (IOException e)
-		{
-			System.out.println("I/O error: can't open sd1/sd2 data files");
-			System.exit(0);
-		}
-
-		try
-		{
-			sd1File.write("");
-			sd1File.flush();
-		} catch (IOException e)
-		{
-			System.err.println("ERROR WRITING TO DATA FILE!\n" + e);
-			System.exit(1);
-		}
     }
 
 	@Override
@@ -539,66 +531,52 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		
 	}
 	
+	/*
+	 * When press enter button
+	 * 1. Write click log
+	 * 2. if finish current block then pop up notification else Load next phrase
+	 */
 	private void enterPressed() {
 		finishCount++;
-		if(finishCount == sentenceSize) {
-			JLabel thankyou = new JLabel("End of This Session. Thank you.");
-			thankyou.setFont(new Font("sansserif", Font.PLAIN, 16));
-			JOptionPane.showMessageDialog(this, thankyou);
-		}
-		initilizeOutput();
-		//TODO Finish current input and write the log
-		//Stop logging the eyegaze data if the eye tracker is started
-		String s2 = text2.getText().toLowerCase();
 		
-		// build output data for sd1 file
-		StringBuilder sd1Stuff = new StringBuilder();
-		//sd1Stuff.append(presentedPhrase).append('\n');
-		//sd1Stuff.append(s2).append('\n');
-		sd1Stuff.append("Letter    Time    Seconds    Xpos     YPos  \n");
-		for (int i = 0; i < samples.size(); ++i)
-			sd1Stuff.append(samples.elementAt(i)).append('\n');
-		sd1Stuff.append('#').append('\n');
+		//Initialize the output data file
+		Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy");
+        System.out.println( sdf.format(cal.getTime()) );
+		//s1 = sdf.format(cal.getTime())+"-"+controlType+".dat";
+		String si = "ClickInfo"+"-"+controlType+"_"+finishCount+"."+sdf.format(cal.getTime())+".dat";
 		
-		// dump data
-		try
-		{
-			sd1File.write(sd1Stuff.toString(), 0, sd1Stuff.length());
-			sd1File.flush();
-		} catch (IOException e)
-		{
-			System.err.println("ERROR WRITING TO DATA FILE!\n" + e);
-			System.exit(1);
-		}
-		
-		try
-		{
-			sd1File.close();
-		} catch (IOException e)
-		{
-			System.err.println("ERROR CLOSING DATA FILES!\n" + e);
-			System.exit(1);
-		}
+		WriteClickLog.getInstance().CfgWriter(targetPhrase, presentedPhrase, samples, si);
 
 		// prepare for next phrase
 	    samples = new Vector<Sample>();
 	    
-	    //Increase the phrase every time click the enter
-	    int cout = Integer.valueOf(blockNo);
-		presentedPhrase = phrases[cout+finishCount];
-		
-		text1.setText(presentedPhrase);
-		targetPhrase = "";
-		text2.setText(targetPhrase);
-		t1 = 0;
-		count = 0;
-		
+	    if(finishCount == sentenceSize) {
+			JLabel thankyou = new JLabel("End of This Session. Thank you.");
+			thankyou.setFont(new Font("sansserif", Font.PLAIN, 16));
+			JOptionPane.showMessageDialog(this, thankyou);
+		}else {
+		    //Increase the phrase every time click the enter
+		    int cout = Integer.valueOf(blockNo);
+			presentedPhrase = phrases[cout+finishCount];
+			
+			text1.setText(presentedPhrase);
+			targetPhrase = "";
+			text2.setText(targetPhrase);
+			t1 = 0;
+			count = 0;
+		}
+	    
+	    showResultDialog();
 	}
 	
-	private void writeClickLog() {
-		for (int i = 0; i < samples.size(); ++i) {
-			
-		}
+	
+	// compute typing speed in wpm given text entered and time in ms
+	public static double wpm(String text, long msTime)
+	{
+		double speed = text.length();
+		speed = speed / (msTime / 1000.0) * (60 / 5);
+		return speed;
 	}
 	
 	public JPanel getMainPanel() {

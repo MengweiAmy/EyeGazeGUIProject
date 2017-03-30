@@ -45,8 +45,5 @@ public class EyeGazeJNI {
 	   
 	   //Initilise the eye gaze image function
 	   public native void EyeGazeImageDisplay();
-	   
-	   //Write click log into .dat file using C++
-	   public native void WriteClickLog(BtnData[] samples);
 
 }
