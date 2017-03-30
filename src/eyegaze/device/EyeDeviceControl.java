@@ -18,7 +18,7 @@ public class EyeDeviceControl {
 	
 	private static EyeDeviceControl control;
 	
-	private long initTime;
+	private long initTime=0;
 	
 	public static EyeDeviceControl getInstance() {
 		if(control == null) {

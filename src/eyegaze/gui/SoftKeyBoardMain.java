@@ -17,7 +17,6 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
@@ -148,8 +147,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	 * Every time comment these two lines if don not need device when debugging
     	 */
     	
-    	//EyeDeviceControl.getInstance().initializeDevice();
-        //isDeviceStarted = true;
+    	EyeDeviceControl.getInstance().initializeDevice();
+        isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
@@ -311,11 +310,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     	double width = screenSize.getWidth();
     	double height = screenSize.getHeight();
-    	System.out.println(width);
-    	System.out.println(height);
     	
     	int w = (int) (width/12);
-    	System.out.println("w"+w);
     	int h = 144;
     	KeyBt[] qwertyKeyboard = { new KeyBt("Q", 0 * w, 0, w, h), new KeyBt("W", 1 * w, 0, w, h), new KeyBt("E", 2 * w, 0, w, h),
     			new KeyBt("R", 3 * w, 0, w, h), new KeyBt("T", 4 * w, 0, w, h), new KeyBt("Y", 5 * w, 0, w, h),
@@ -497,7 +493,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		if (t1 == 0)
 			t1 = System.currentTimeMillis();
 		t2 = System.currentTimeMillis() - t1;
-		
 		/*
 		 * Calculate the click time based on the device init time(sec)
 		 */

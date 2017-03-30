@@ -32,7 +32,7 @@ public class WriteClickLog {
 			CfgWrite.newLine();
 			CfgWrite.write("Entered Phrase: " + target);
 			CfgWrite.newLine();
-			CfgWrite.write("Index    Letter   Time    Seconds    Xpos     YPos   ");
+			CfgWrite.write("Index    Letter       Time       Seconds      Xpos       YPos   ");
 			CfgWrite.newLine();
 			for (int i = 0; i < samples.size(); i++) {
 				CfgWrite.write(i+"   " + samples.get(i).toString());

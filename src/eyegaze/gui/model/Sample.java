@@ -23,7 +23,7 @@ public class Sample {
 		if (key.equals(" "))
 			key = "_";
 		//return key + ", " + time  + "," + second + "," + xPos + "," + yPos;
-		return  "   "+ key + "    " + time  + "     " + second + "     " + xPos + "     " + yPos;
+		return  "       "+ key + "         " + time  + "         " + second + "        " + xPos + "        " + yPos;
 	}
 
 	private long time;
