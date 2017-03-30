@@ -96,6 +96,14 @@ public class EyeGazeRetrieveData {
 							currentIndex++;
 							isNotified = true;
 						}
+						if(model.getyPosition() > 576) {
+							//means the gaze point is on setting key
+							//the button will be clicked when the fixation points are more than 100 or more
+							if(fixationList.size() > 150) {
+								SoftKeyBoardMain.getInstance().isActiveSetting(true);
+							}
+							
+						}
 						//System.out.println("Detecting one fixation:Already notified, DO NOTHING"+ fixationList.size());
 						//TODO
 						//Notify the application that we have recevied one fixation data

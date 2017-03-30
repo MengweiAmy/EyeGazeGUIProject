@@ -47,11 +47,11 @@ import javax.swing.border.TitledBorder;
 
 import eyegaze.device.EyeDeviceControl;
 import eyegaze.device.RetrieveDataThread;
-import eyegaze.device.WriteClickLog;
-import eyegaze.gui.control.AnalysisGazeLog;
-import eyegaze.gui.control.MouseControlService;
 import eyegaze.gui.model.KeyBt;
 import eyegaze.gui.model.Sample;
+import eyegaze.gui.service.AnalysisGazeLog;
+import eyegaze.gui.service.MouseControlService;
+import eyegaze.gui.service.WriteClickLog;
 import eyegaze.jni.EyeGazeRetrieveData;
 
 /**
@@ -119,6 +119,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private String dwellTime;
 	private String blockNo;
 	
+	private boolean isActiveSetting = false;
+	
 	
 	/************************************Device Parameters **************************************************/
 	private boolean isLogstared = false;
@@ -147,13 +149,16 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	 * Every time comment these two lines if don not need device when debugging
     	 */
     	
-    	EyeDeviceControl.getInstance().initializeDevice();
-        isDeviceStarted = true;
+    	//EyeDeviceControl.getInstance().initializeDevice();
+        //isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
 	    p1 = createTextField();
 	    System.out.println(controlType);
+	    
+	    System.out.println("dwellTime is changed"+ dwellTime);
+	    System.out.println("blockNo is changed"+blockNo);
 	    
 	    /*
 	     * Add glass pane on keyboard panel to avoid mouse click events
@@ -172,6 +177,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
             // make sure the focus won't leave the glass pane
             setGlassPane(glass);
         	glass.setVisible(true);
+	    }else {
+	    	//Mouse control will set settings active as default
+	    	isActiveSetting = true;
 	    }
 	    
 	    p1.setOpaque(true); 
@@ -189,10 +197,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
                 	
                 	//Stop get data thread first and then shut down device
                 	if(isThreadStarted) {
-                		System.out.println("JAVA log: shutting down the fetch data thread..");
-                		retriThread.destory();
-                		EyeDeviceControl.getInstance().stopDataCollection();
-                		isThreadStarted = false;
+                		stopGazeControl();
                 	}
                 	try {
                 		/**
@@ -241,6 +246,13 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	retriThread = new RetrieveDataThread();
     	retriThread.run();
     	isThreadStarted = true;
+    }
+    
+    private void stopGazeControl() {
+    	System.out.println("JAVA log: shutting down the fetch data thread..");
+		retriThread.destory();
+		EyeDeviceControl.getInstance().stopDataCollection();
+		isThreadStarted = false;
     }
     
     /*
@@ -513,8 +525,12 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 			}
 		}else if(s.equals("Setting")) {
 			//TODO
+			if(isActiveSetting) {
+				activeSettingDialog();
+			}
 		}else if(s.equals("Shift")) {
 			//TODO
+			
 		}
 		else
 		// just a keystroke; add to transcribed text
@@ -524,6 +540,22 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 			text2.requestFocus(); // so I-beam (caret) does not disappear
 		}
 		
+	}
+	
+	//Active the setting dialog and stop all the gaze operation
+	private void activeSettingDialog() {
+		int confirm = JOptionPane.showOptionDialog(this,
+                "Please note that if the settings changed then the device would be recalibrate",
+                "Information", 
+                JOptionPane.OK_OPTION,
+                JOptionPane.PLAIN_MESSAGE, null, null, null);
+		
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+            	SettingDialog soft = new SettingDialog();
+            	soft.createDialog();
+            }
+       });
 	}
 	
 	/*
@@ -598,5 +630,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	public void setSentenceSize(int size) {
 		this.sentenceSize = size;
+	}
+	
+	public void isActiveSetting(boolean isactive) {
+		this.isActiveSetting = isactive;
 	}
 }

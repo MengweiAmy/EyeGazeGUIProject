@@ -1,4 +1,4 @@
-package eyegaze.gui.control;
+package eyegaze.gui.service;
 
 import java.io.BufferedReader;
 import java.io.File;

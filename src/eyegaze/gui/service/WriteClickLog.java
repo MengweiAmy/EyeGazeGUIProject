@@ -1,4 +1,4 @@
-package eyegaze.device;
+package eyegaze.gui.service;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

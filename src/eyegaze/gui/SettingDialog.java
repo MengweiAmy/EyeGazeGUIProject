@@ -20,6 +20,8 @@ import javax.swing.SpringLayout;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
+import eyegaze.gui.model.Configuration;
+import eyegaze.gui.service.ConfigurationService;
 import eyegaze.gui.tools.SpringUtilities;
 import eyegaze.jni.EyeGazeRetrieveData;
 
@@ -52,9 +54,20 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private String[] offsetList = {"30","50","65","75","100"};
 	
-	private String[] dwellList = {"50ms", "100ms","200ms","250ms","300ms","500ms"};
+	private String[] dwellList = {"50ms", "100ms","200ms","300ms","500ms"};
 	
 	private String[] sentenCeList = {"1","3","5","10","15"};
+	
+    
+    String[] labels = {"Select Control Type:", "Select Minimum fixation samples:", "Select Minimum fixation offset:", "Select dwell time(millSec):"
+   		 ,"Select Phrases block", "Select sentence size:"};
+    
+    String[] types = { "Mouse Control", "Gaze Control"};
+    
+    int sampleIndex=0;
+    int offsetIndex=0;   
+    int dwellIndex=0;
+    int controlIndex = 0;
 
 	/**
 	 * 
@@ -62,17 +75,14 @@ public class SettingDialog extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	
 	public void createDialog() {
+		 loadConfig();
+		
 		 JFrame frame = this;
 		 int w = 600;
 		 int h = 300;
 		 setSize(new Dimension(w, h));
 	     frame.setLocationRelativeTo(null);
 	     frame.setTitle("Settings");
-	     
-	     String[] labels = {"Select Control Type:", "Select Minimum fixation samples:", "Select Minimum fixation offset:", "Select dwell time(millSec):"
-	    		 ,"Select Phrases block", "Select sentence size:"};
-	     
-	     String[] types = { "Mouse Control", "Gaze Control"};
 
 	     int numPairs = labels.length;
 
@@ -87,22 +97,23 @@ public class SettingDialog extends JFrame implements ActionListener{
 	        	 controlTypeCombo = new JComboBox(currTypes);
 	        	 l.setLabelFor(controlTypeCombo);
 		         p.add(controlTypeCombo);
+		         controlTypeCombo.setSelectedIndex(controlIndex);
 	         }else if(i==1) {
 	        	 currTypes = sampleList;
 	        	 fixationSampleCombo = new JComboBox(currTypes);
 	        	 l.setLabelFor(fixationSampleCombo);
 		         p.add(fixationSampleCombo);
-		         fixationSampleCombo.setSelectedIndex(4);
+		         fixationSampleCombo.setSelectedIndex(sampleIndex);
 	         }else if(i==2){
 	        	 currTypes = offsetList;
 	        	 fixationOffsetCombo = new JComboBox(currTypes);
-	        	 fixationOffsetCombo.setSelectedIndex(2);
+	        	 fixationOffsetCombo.setSelectedIndex(offsetIndex);
 	        	 l.setLabelFor(fixationOffsetCombo);
 		         p.add(fixationOffsetCombo);
 	         }else if(i==3) {
 	        	 currTypes = dwellList;
 	        	 dwellCombo = new JComboBox(currTypes);
-	        	 dwellCombo.setSelectedIndex(4);
+	        	 dwellCombo.setSelectedIndex(dwellIndex);
 	        	 l.setLabelFor(dwellCombo);
 		         p.add(dwellCombo);
 	         }else if(i==4) {
@@ -151,16 +162,28 @@ public class SettingDialog extends JFrame implements ActionListener{
 		 b.addActionListener(new ActionListener() {
 			    @Override
 			    public void actionPerformed(ActionEvent event) {
+			    	
+			    	Configuration cfg = new Configuration();
+			    	
 			        String controlTye = (String) controlTypeCombo.getSelectedItem();
+			        cfg.setControlType(controlTypeCombo.getSelectedIndex());
 			        
 			        String dwellTime = (String) dwellCombo.getSelectedItem();
 			        String time = dwellTime.substring(0, dwellTime.length()-2);
+			        cfg.setDwellTime(Integer.valueOf(time));
 			        
 			        String blockNo = (String) phraseBlockCombo.getSelectedItem();
 			        
 			        String sentenSiz = (String)sentenSizeCombo.getSelectedItem();
 			        
 			        String fixationSiz = (String)fixationSampleCombo.getSelectedItem();
+			        cfg.setFixationSamples(Integer.valueOf(fixationSiz));
+			        
+			        String fixationOff = (String)fixationOffsetCombo.getSelectedItem();
+			        cfg.setFixationOffset(Integer.valueOf(fixationOff));
+			        
+			        //Save configuration
+			        saveConfig(cfg);
 			        
 			        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			            public void run() {
@@ -207,6 +230,49 @@ public class SettingDialog extends JFrame implements ActionListener{
 	      this.addWindowListener(exitListener);
 		  this.setExtendedState(JFrame.NORMAL);
 		  this.setVisible(true);
+	}
+	
+	/*
+	 * Automatically save configuration when click the ok button
+	 */
+	private void saveConfig(Configuration config) {
+		ConfigurationService.getInstance().writeConfig(config);
+	}
+	
+	/*
+	 * Load config when open the setting dialog
+	 */
+	private void loadConfig() {
+		Configuration cfe = ConfigurationService.getInstance().loadConfig();
+		if(cfe != null) {
+			int fixa = cfe.getFixationSamples();
+			
+			for(int i =0;i<sampleList.length;i++) {
+				if(Integer.valueOf(sampleList[i]) == fixa) {
+					sampleIndex = i;
+					break;
+				}
+			}
+			
+			int offSet = cfe.getFixationOffset();
+			for(int i =0;i<offsetList.length;i++) {
+				if(Integer.valueOf(offsetList[i]) == offSet) {
+					offsetIndex = i;
+					break;
+				}
+			}
+			
+			
+			int dwelTime = cfe.getDwellTime();
+			for(int i =0;i<dwellList.length;i++) {
+				String time = dwellList[i].substring(0, dwellList[i].length()-2);
+				if(Integer.valueOf(time) == dwelTime) {
+					dwellIndex = i;
+					break;
+				}
+			}
+			controlIndex = cfe.getControlType();
+		}
 	}
 
 	@Override
