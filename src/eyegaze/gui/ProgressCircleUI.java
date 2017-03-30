@@ -8,7 +8,6 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
 
 import javax.swing.JComponent;
 import javax.swing.plaf.basic.BasicProgressBarUI;
@@ -20,7 +19,6 @@ public class ProgressCircleUI extends BasicProgressBarUI {
 	
 	@Override public Dimension getPreferredSize(JComponent c) {
 	    Dimension d = super.getPreferredSize(c);
-	    int v = Math.max(d.width, d.height);
 	    d.setSize(radium, radium);
 	    return d;
 	  }
@@ -44,9 +42,9 @@ public class ProgressCircleUI extends BasicProgressBarUI {
 	    double cy = b.top  + barRectHeight * .5;
 
 	    double or = sz * .5;
-	    double ir = or * .5; //or - 20;
+	    //double ir = or * .5; //or - 20;
 
-	    Shape inner = new Ellipse2D.Double(cx - ir, cy - ir, ir * 2, ir * 2);
+	    //Shape inner = new Ellipse2D.Double(cx - ir, cy - ir, ir * 2, ir * 2);
 	    Shape outer = new Arc2D.Double(
 	        cx - or, cy - or, sz, sz, 90 - degree, degree, Arc2D.PIE);
 

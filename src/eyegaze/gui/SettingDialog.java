@@ -74,6 +74,7 @@ public class SettingDialog extends JFrame implements ActionListener{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	@SuppressWarnings("unchecked")
 	public void createDialog() {
 		 loadConfig();
 		
