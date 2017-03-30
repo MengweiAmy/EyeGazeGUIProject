@@ -149,8 +149,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	 * Every time comment these two lines if don not need device when debugging
     	 */
     	
-    	//EyeDeviceControl.getInstance().initializeDevice();
-        //isDeviceStarted = true;
+    	EyeDeviceControl.getInstance().initializeDevice();
+        isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
@@ -544,12 +544,14 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	
 	//Active the setting dialog and stop all the gaze operation
 	private void activeSettingDialog() {
+		System.out.println("settings button is pressed");
 		int confirm = JOptionPane.showOptionDialog(this,
                 "Please note that if the settings changed then the device would be recalibrate",
                 "Information", 
                 JOptionPane.OK_OPTION,
                 JOptionPane.PLAIN_MESSAGE, null, null, null);
-		
+		//Stop current data collection
+		stopGazeControl();
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
             	SettingDialog soft = new SettingDialog();
@@ -579,6 +581,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	    samples = new Vector<Sample>();
 	    
 	    if(finishCount == sentenceSize) {
+
+			//if it is the end of the block , stop the data collection thread
+	    	stopGazeControl();
+	    	
 			JLabel thankyou = new JLabel("End of This Session. Thank you.");
 			thankyou.setFont(new Font("sansserif", Font.PLAIN, 16));
 			JOptionPane.showMessageDialog(this, thankyou);

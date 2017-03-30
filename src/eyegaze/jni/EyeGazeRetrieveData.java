@@ -52,17 +52,6 @@ public class EyeGazeRetrieveData {
 			//Used in written log
 			rawData.add(data);
 			
-			System.out.println("focus range:" + data.getFoucsRangeOffsetMm());
-			System.out.println("ext offset:" + data.getfLengExtOffsetMm());
-			/*
-			 * If current data has not found the eye data, then return
-			 */
-			System.out.println("isDataFound:"+data.isGazeVectorFound() );
-//			if(data.isGazeVectorFound() == 0) {
-//				System.out.println("DID not find eye data");
-//				return;
-//			}
-			
 			int pupilXPos = data.getiIGaze();
 			int pupilYPos = data.getiJGaze();		
 			/*
@@ -106,7 +95,7 @@ public class EyeGazeRetrieveData {
 						}
 						//System.out.println("Detecting one fixation:Already notified, DO NOTHING"+ fixationList.size());
 						//TODO
-						//Notify the application that we have recevied one fixation data
+						//Notify the application that we have received one fixation data
 						//And prepare to write into the dat file
 					}
 				}else {
@@ -149,7 +138,6 @@ public class EyeGazeRetrieveData {
 	 * By calling the verify fixtaion function from JNI
 	 */
 	public static void writeFixationDataLog() {
-		System.out.println("received raw data size:start writing log" + rawData.size());
 		EyeGazeData[] rawDataArray = new EyeGazeData[rawData.size()];
 		for(int i=0; i< rawData.size(); i++) {
 			rawDataArray[i] = rawData.get(i);
