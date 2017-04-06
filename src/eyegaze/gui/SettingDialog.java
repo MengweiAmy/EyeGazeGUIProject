@@ -36,8 +36,6 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private JFrame frame;
 	
-	int controlType=0;
-	
 	private JComboBox controlTypeCombo;
 	
 	private JComboBox fixationSampleCombo;
@@ -168,6 +166,7 @@ public class SettingDialog extends JFrame implements ActionListener{
 			    	
 			        String controlTye = (String) controlTypeCombo.getSelectedItem();
 			        cfg.setControlType(controlTypeCombo.getSelectedIndex());
+			        System.out.println("settings"+controlTye);
 			        
 			        String dwellTime = (String) dwellCombo.getSelectedItem();
 			        String time = dwellTime.substring(0, dwellTime.length()-2);

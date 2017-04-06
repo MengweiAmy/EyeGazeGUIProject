@@ -236,8 +236,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	     */
 	    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	    if(controlType == "Gaze Control" && isDeviceStarted){
-		    startGazeControl();
 	    	initilizeTimerForEachButton();
+		    startGazeControl();
 	    }
     }    
     
@@ -250,7 +250,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     
     private void stopGazeControl() {
     	System.out.println("JAVA log: shutting down the fetch data thread..");
-		retriThread.destory();
+    	if(isThreadStarted) {
+    		retriThread.destory();    		
+    	}
 		EyeDeviceControl.getInstance().stopDataCollection();
 		isThreadStarted = false;
     }
@@ -455,7 +457,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	for(int i=0;i < jbtnList.length; i++) {
     		JProgressBar proBar = progressBarList[i];
     		JButton jbtn = jbtnList[i];
-    		System.out.println("current select dwelltime" + dwellTime);
     		if(Integer.valueOf(dwellTime) <= 100) {
     			delay = Integer.valueOf(dwellTime)/25;
     			offset = 5;

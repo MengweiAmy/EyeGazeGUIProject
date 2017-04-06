@@ -51,7 +51,7 @@ public class EyeGazeRetrieveData {
 		if(data != null) {
 			//Used in written log
 			rawData.add(data);
-			
+			System.out.println("receiving data.......");
 			int pupilXPos = data.getiIGaze();
 			int pupilYPos = data.getiJGaze();		
 			/*
@@ -71,12 +71,14 @@ public class EyeGazeRetrieveData {
 					//If it belongs to the same fixation, add to the fixation list
 					FixationModel nextMo = convertEyeGazeDataToFixation(data);
 					fixationList.add(nextMo);
+					System.out.println("fixationList   "+fixationList.size());
+					System.out.println("miniFixationSize/3   "+miniFixationSize/3);
 					// if the current list size is larger than 6, then marked as one fixation
 					if(fixationList.size() >= miniFixationSize/3) {
 						//If it is the first time to reach 6 gaze points, notify the application,
 						//Otherwise just add the list
 						if(!isNotified) {
-							//System.out.println("Detecting one fixation data:Notifying the application");
+							System.out.println("Detecting one fixation data:Notifying the application");
 							
 							SoftKeyBoardMain.getInstance().getKeyByPosition(model.getxPosition(), model.getyPosition());
 							//Set fixation index and plus the currentIndex
@@ -93,7 +95,7 @@ public class EyeGazeRetrieveData {
 							}
 							
 						}
-						//System.out.println("Detecting one fixation:Already notified, DO NOTHING"+ fixationList.size());
+						System.out.println("Detecting one fixation:Already notified, DO NOTHING"+ fixationList.size());
 						//TODO
 						//Notify the application that we have received one fixation data
 						//And prepare to write into the dat file

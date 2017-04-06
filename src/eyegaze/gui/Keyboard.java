@@ -66,7 +66,11 @@ public class Keyboard extends JLayeredPane implements ActionListener {
 			 */
 			if(controlType.equals("Gaze Control")) {
 				progressBar[i] = createProgressBar();
-				progressBar[i].setBounds(key[i].getX(), key[i].getY(), key[i].getW(), key[i].getH());
+				int widRad = 30;
+				int centerWid = key[i].getW()/2;
+				int centerHei = key[i].getH()/2;
+				progressBar[i].setBounds(key[i].getX()+(centerWid-widRad), key[i].getY()+(centerHei-widRad), widRad*2, widRad*2);
+				//progressBar[i].setBounds(key[i].getX(), key[i].getY(), key[i].getW(), key[i].getH());
 	            add(progressBar[i] , new Integer(1));
 			}
 		}
@@ -86,7 +90,7 @@ public class Keyboard extends JLayeredPane implements ActionListener {
 	    progress.setUI(new ProgressCircleUI());
 	    progress.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 	    progress.setStringPainted(true);
-	    progress.setFont(progress.getFont().deriveFont(24f));
+	    progress.setFont(progress.getFont().deriveFont(18f));
 	    progress.setForeground(Color.ORANGE);
 	    
 	    return progress;
