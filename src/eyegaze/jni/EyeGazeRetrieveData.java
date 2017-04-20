@@ -51,14 +51,17 @@ public class EyeGazeRetrieveData {
 		if(data != null) {
 			//Used in written log
 			rawData.add(data);
-			System.out.println("receiving data.......");
 			int pupilXPos = data.getiIGaze();
-			int pupilYPos = data.getiJGaze();		
+			int pupilYPos = data.getiJGaze();
+			System.out.println("pupilXPos......."+pupilXPos);
+			System.out.println("pupilYPos......."+pupilYPos);
 			/*
 			 * If current data is the first point of fixation verification
 			 */
 			if(model == null) {
+				System.out.println("first model.......");
 				model = convertEyeGazeDataToFixation(data);
+				System.out.println("first model......."+model.getxEyeballMm());
 				model.setFixationIndex(currentIndex);
 				fixationList = new ArrayList<FixationModel>();
 				fixationList.add(model);
@@ -66,8 +69,10 @@ public class EyeGazeRetrieveData {
 				/*
 				 * If the fixation list size is bigger than 0 but small than 6
 				 */
+				System.out.println("not the first model.......");
 				boolean isSame = model.isSameFixation(pupilXPos, pupilYPos);
 				if(isSame) {
+					System.out.println("same fixation as last time......");
 					//If it belongs to the same fixation, add to the fixation list
 					FixationModel nextMo = convertEyeGazeDataToFixation(data);
 					fixationList.add(nextMo);
@@ -101,6 +106,7 @@ public class EyeGazeRetrieveData {
 						//And prepare to write into the dat file
 					}
 				}else {
+					System.out.println("not the same fixation model.......");
 					SoftKeyBoardMain.getInstance().stopProgressBarTimer();
 					/*
 					 * Empty the previous list and create a new possible fixation point

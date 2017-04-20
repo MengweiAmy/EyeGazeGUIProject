@@ -9,6 +9,8 @@ public class Configuration {
 	private int fixationOffset;
 	
 	private int dwellTime;
+	
+	private int blockRef;
 
 	public int getControlType() {
 		return controlType;
@@ -41,7 +43,13 @@ public class Configuration {
 	public void setDwellTime(int dwellTime) {
 		this.dwellTime = dwellTime;
 	}
-	
-	
+
+	public int getBlockRef() {
+		return blockRef;
+	}
+
+	public void setBlockRef(int blockRef) {
+		this.blockRef = blockRef;
+	}
 
 }

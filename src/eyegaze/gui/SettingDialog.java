@@ -52,7 +52,7 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private String[] offsetList = {"30","50","65","75","100"};
 	
-	private String[] dwellList = {"50ms", "100ms","200ms","300ms","500ms"};
+	private String[] dwellList = {"50ms", "100ms","150ms","200ms","250ms","300ms","350ms","400ms","500ms"};
 	
 	private String[] sentenCeList = {"1","3","5","10","15"};
 	
@@ -66,6 +66,9 @@ public class SettingDialog extends JFrame implements ActionListener{
     int offsetIndex=0;   
     int dwellIndex=0;
     int controlIndex = 0;
+    int phraseIndex = 0;
+    
+    int phraseSize = 100;
 
 	/**
 	 * 
@@ -116,12 +119,12 @@ public class SettingDialog extends JFrame implements ActionListener{
 	        	 l.setLabelFor(dwellCombo);
 		         p.add(dwellCombo);
 	         }else if(i==4) {
-	        	 currTypes = new String[20];
-	        	 for(int j=0; j< 20; j++) {
+	        	 currTypes = new String[phraseSize];
+	        	 for(int j=0; j< phraseSize; j++) {
 	        		 currTypes[j] = ""+j;
 	        	 }
 	        	 phraseBlockCombo = new JComboBox(currTypes);
-	        	 phraseBlockCombo.setSelectedIndex(0);
+	        	 phraseBlockCombo.setSelectedIndex(phraseIndex);
 	        	 l.setLabelFor(phraseBlockCombo);
 		         p.add(phraseBlockCombo);
 	         }else if(i==5) {
@@ -171,8 +174,10 @@ public class SettingDialog extends JFrame implements ActionListener{
 			        String dwellTime = (String) dwellCombo.getSelectedItem();
 			        String time = dwellTime.substring(0, dwellTime.length()-2);
 			        cfg.setDwellTime(Integer.valueOf(time));
+			        System.out.println("time:"+time);
 			        
 			        String blockNo = (String) phraseBlockCombo.getSelectedItem();
+			        cfg.setBlockRef(Integer.valueOf(blockNo));
 			        
 			        String sentenSiz = (String)sentenSizeCombo.getSelectedItem();
 			        
@@ -271,6 +276,8 @@ public class SettingDialog extends JFrame implements ActionListener{
 					break;
 				}
 			}
+			
+			phraseIndex = cfe.getBlockRef();
 			controlIndex = cfe.getControlType();
 		}
 	}

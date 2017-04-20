@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
@@ -85,6 +86,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	private JTextField text1;
 	private JTextField text2;
 	
+	private boolean isShiftPress=false;
+	
 	/**************************************Load phrases parameters**************************************/
 	
 	private String[] phrases;
@@ -134,6 +137,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 	JOptionPane resultsPane;
 	JTextArea resultsArea;
 	
+	private List<String> clickedKeys = new ArrayList<String>();
+	
 	public static SoftKeyBoardMain getInstance() {
 		if(softKeyboard == null) {
 			softKeyboard = new SoftKeyBoardMain();
@@ -149,8 +154,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
     	 * Every time comment these two lines if don not need device when debugging
     	 */
     	
-    	EyeDeviceControl.getInstance().initializeDevice();
-        isDeviceStarted = true;
+    	//EyeDeviceControl.getInstance().initializeDevice();
+        //isDeviceStarted = true;
     	
 	    JFrame frame = this;
 	    frame.setTitle("Current Control Type:" + controlType);
@@ -391,7 +396,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		StringBuilder resultsString = new StringBuilder();
 		resultsString.append(" DATA COLLECTED:\n");
 		resultsString.append(String.format("   Presented:\t\t%s\n", presentedPhrase));
-		resultsString.append(String.format("   Transcribed:\t%s\n", targetPhrase));
+		resultsString.append(String.format("   Transcribed:\t%s\n", clickedKeys.toString()));
 		resultsString.append(String.format("   Keystrokes:\t\t%d\n", count));
 		resultsString.append(String.format("   Characters:\t\t%d (%.1f words)\n", targetPhrase.length(), targetPhrase.length() / 5.0));
 		resultsString.append(String.format("   Time:\t\t%.2f s (%.2f minutes)\n", t2 / 1000.0, t2 / 1000.0 / 60.0));
@@ -401,7 +406,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		//resultsString.append(String.format("   Error rate:\t\t%.2f%%\n", s1s2.getErrorRateNew()));
 		resultsString.append(String.format("   KSPC:\t\t%.4f\n", (double)count / targetPhrase.length()));
 		resultsArea.setText(resultsString.toString());
-		resultsDialog.setVisible(true);
+		//resultsDialog.setVisible(true);
     }
     
     //Based on the x,y axis to analyze current button
@@ -472,6 +477,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
   			      		System.out.println("timer is stoped!"+ jbtnList[currentIndex].getText() + " :" + System.currentTimeMillis());
   			      		if(!hasPerformClick) {
   			      			jbtn.doClick();
+  			      			clickedKeys.add(jbtn.getText()+" ");
   			      			System.out.println("Calling doclick function by" + jbtnList[currentIndex].getText());
   			      			hasPerformClick = true;
   			      			//The button layer back to top again
@@ -495,7 +501,15 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 		
 		JButton jb = (JButton)action.getSource();
 		String s = jb.getText();
-		char c = (s.toLowerCase()).charAt(0);
+		char c = s.charAt(0);
+		if(isShiftPress) {
+			s = s.toUpperCase();
+			isShiftPress = false;
+		}else {
+			c = s.toLowerCase().charAt(0);
+		}
+		//char c = (s.toLowerCase()).charAt(0);
+		System.out.println(c);
 		
 		int x = jb.getX();
 		//Add the offset of jPanel. The raw Y axis is the position based on keyboard panel
@@ -531,7 +545,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
 			}
 		}else if(s.equals("Shift")) {
 			//TODO
-			
+			isShiftPress = true;
 		}
 		else
 		// just a keystroke; add to transcribed text
@@ -574,7 +588,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener{
         SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy");
         System.out.println( sdf.format(cal.getTime()) );
 		//s1 = sdf.format(cal.getTime())+"-"+controlType+".dat";
-		String si = "ClickInfo"+"-"+controlType+"_"+finishCount+"."+sdf.format(cal.getTime())+".dat";
+		String si = "ClickInfo"+"_"+finishCount+sdf.format(cal.getTime())+".dat";
 		
 		WriteClickLog.getInstance().CfgWriter(targetPhrase, presentedPhrase, samples, si);
 

@@ -29,6 +29,7 @@ public class ConfigurationService {
 		    props.setProperty("dwellTime", config.getDwellTime()+"");
 		    props.setProperty("FixationSamples", config.getFixationSamples()+"");
 		    props.setProperty("FixationOffset", config.getFixationOffset()+"");
+		    props.setProperty("BlockReference", config.getBlockRef()+"");
 		    FileWriter writer = new FileWriter(configFile);
 		    props.store(writer, "Parameter Settings");
 		    writer.close();
@@ -55,6 +56,9 @@ public class ConfigurationService {
 		    
 		    String fixaSam = props.getProperty("FixationSamples");
 		    config.setFixationSamples(Integer.valueOf(fixaSam));
+		    
+		    String blockRef = props.getProperty("BlockReference");
+		    config.setBlockRef(Integer.valueOf(blockRef));
 		    
 		    String fixaOff = props.getProperty("FixationOffset");
 		    config.setFixationOffset(Integer.valueOf(fixaOff));
