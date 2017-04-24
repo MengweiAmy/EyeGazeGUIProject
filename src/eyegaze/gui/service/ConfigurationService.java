@@ -30,6 +30,7 @@ public class ConfigurationService {
 		    props.setProperty("FixationSamples", config.getFixationSamples()+"");
 		    props.setProperty("FixationOffset", config.getFixationOffset()+"");
 		    props.setProperty("BlockReference", config.getBlockRef()+"");
+		    props.setProperty("SentenceType", config.getSentenceType()+"");
 		    FileWriter writer = new FileWriter(configFile);
 		    props.store(writer, "Parameter Settings");
 		    writer.close();
@@ -62,6 +63,11 @@ public class ConfigurationService {
 		    
 		    String fixaOff = props.getProperty("FixationOffset");
 		    config.setFixationOffset(Integer.valueOf(fixaOff));
+		    
+		    String senType = props.getProperty("SentenceType");
+		    if(senType != null && !senType.equals("")) {
+		    	 config.setSentenceType(Integer.valueOf(senType));
+		    }
 		    reader.close();
 		} catch (FileNotFoundException ex) {
 		    // file does not exist

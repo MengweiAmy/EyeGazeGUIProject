@@ -87,7 +87,7 @@ public class Keyboard extends JLayeredPane implements ActionListener {
 	private JProgressBar createProgressBar() {
 	    JProgressBar progress = new JProgressBar();
 	    // use JProgressBar#setUI(...) method
-	    progress.setUI(new ProgressCircleUI());
+	    progress.setUI(new ProgressCircleUI(true));
 	    progress.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 	    progress.setStringPainted(true);
 	    progress.setFont(progress.getFont().deriveFont(18f));

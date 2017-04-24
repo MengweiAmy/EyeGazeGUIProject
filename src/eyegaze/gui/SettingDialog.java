@@ -48,6 +48,10 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private JComboBox sentenSizeCombo;
 	
+	private JComboBox dwellTimeTypeCombo;
+	
+	private JComboBox sentenTypeCombo;
+	
 	private String[] sampleList = {"20","30","40","50","75","100","150","200"};
 	
 	private String[] offsetList = {"30","50","65","75","100"};
@@ -56,9 +60,13 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private String[] sentenCeList = {"1","3","5","10","15"};
 	
+	private String[] dwellTimeType = {"consistent","random"};
+	
+	private String[] sentenType= {"Long Sentence","Short Sentence"};
+	
     
     String[] labels = {"Select Control Type:", "Select Minimum fixation samples:", "Select Minimum fixation offset:", "Select dwell time(millSec):"
-   		 ,"Select Phrases block", "Select sentence size:"};
+   		 ,"Select Phrases block", "Select sentence size:", "Dwell Time Type:", "Sentence Type:"};
     
     String[] types = { "Mouse Control", "Gaze Control"};
     
@@ -67,6 +75,7 @@ public class SettingDialog extends JFrame implements ActionListener{
     int dwellIndex=0;
     int controlIndex = 0;
     int phraseIndex = 0;
+    int sentTypeIndex = 0;
     
     int phraseSize = 100;
 
@@ -133,6 +142,18 @@ public class SettingDialog extends JFrame implements ActionListener{
 	        	 sentenSizeCombo.setSelectedIndex(0);
 	        	 l.setLabelFor(sentenSizeCombo);
 		         p.add(sentenSizeCombo);
+	         }else if(i==6) {
+	        	 currTypes = dwellTimeType;
+	        	 dwellTimeTypeCombo = new JComboBox(dwellTimeType);
+	        	 dwellTimeTypeCombo.setSelectedIndex(0);
+	        	 l.setLabelFor(dwellTimeTypeCombo);
+		         p.add(dwellTimeTypeCombo);
+	         }else if(i==7) {
+	        	 currTypes = sentenType;
+	        	 sentenTypeCombo = new JComboBox(sentenType);
+	        	 sentenTypeCombo.setSelectedIndex(sentTypeIndex);
+	        	 l.setLabelFor(sentenTypeCombo);
+		         p.add(sentenTypeCombo);
 	         }
 	     }
 
@@ -180,12 +201,19 @@ public class SettingDialog extends JFrame implements ActionListener{
 			        cfg.setBlockRef(Integer.valueOf(blockNo));
 			        
 			        String sentenSiz = (String)sentenSizeCombo.getSelectedItem();
+			        cfg.setBlockSize(Integer.valueOf(sentenSiz));
 			        
 			        String fixationSiz = (String)fixationSampleCombo.getSelectedItem();
 			        cfg.setFixationSamples(Integer.valueOf(fixationSiz));
 			        
 			        String fixationOff = (String)fixationOffsetCombo.getSelectedItem();
 			        cfg.setFixationOffset(Integer.valueOf(fixationOff));
+			        
+			        int dwellType = dwellTimeTypeCombo.getSelectedIndex();
+			        cfg.setDwellType(dwellType);
+			        
+			        int sentec = sentenTypeCombo.getSelectedIndex();
+			        cfg.setSentenceType(sentec);
 			        
 			        //Save configuration
 			        saveConfig(cfg);
@@ -205,9 +233,11 @@ public class SettingDialog extends JFrame implements ActionListener{
 			            	 * Set controlType before start the application
 			            	 */
 			            	SoftKeyBoardMain.getInstance().setControlType(controlTye);
-			            	SoftKeyBoardMain.getInstance().setDwellTime(time);
 			            	SoftKeyBoardMain.getInstance().setSentenceSize(Integer.valueOf(sentenSiz));
-			            	SoftKeyBoardMain.getInstance().setBlockNo(blockNo);
+			            	SoftKeyBoardMain.getInstance().setBlockNo(Integer.valueOf(blockNo));
+			            	SoftKeyBoardMain.getInstance().setDwellType(dwellType);
+			            	SoftKeyBoardMain.getInstance().setDwellTime(Integer.valueOf(time));
+			            	SoftKeyBoardMain.getInstance().setIsLongsentence(sentec);
 			            	SoftKeyBoardMain.getInstance().createAndShowGUI(); 
 			            	
 			            	/*
@@ -279,6 +309,8 @@ public class SettingDialog extends JFrame implements ActionListener{
 			
 			phraseIndex = cfe.getBlockRef();
 			controlIndex = cfe.getControlType();
+			sentTypeIndex = cfe.getSentenceType();
+			
 		}
 	}
 

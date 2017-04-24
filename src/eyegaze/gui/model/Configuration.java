@@ -12,6 +12,12 @@ public class Configuration {
 	
 	private int blockRef;
 
+	private int dwellType;
+	
+	private int sentenceType;
+	
+	private int blockSize;
+	
 	public int getControlType() {
 		return controlType;
 	}
@@ -50,6 +56,30 @@ public class Configuration {
 
 	public void setBlockRef(int blockRef) {
 		this.blockRef = blockRef;
+	}
+
+	public int getDwellType() {
+		return dwellType;
+	}
+
+	public void setDwellType(int dwellType) {
+		this.dwellType = dwellType;
+	}
+
+	public int getSentenceType() {
+		return sentenceType;
+	}
+
+	public void setSentenceType(int sentenceType) {
+		this.sentenceType = sentenceType;
+	}
+
+	public int getBlockSize() {
+		return blockSize;
+	}
+
+	public void setBlockSize(int blockSize) {
+		this.blockSize = blockSize;
 	}
 
 }

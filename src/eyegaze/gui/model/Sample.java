@@ -16,6 +16,14 @@ public class Sample {
 	public void setYPos(int y) {
 		yPos = y;
 	}
+	
+	public int getDwellTime() {
+		return dwellTime;
+	}
+
+	public void setDwellTime(int dwellTime) {
+		this.dwellTime = dwellTime;
+	}
 
 	public String toString()
 	{
@@ -23,7 +31,7 @@ public class Sample {
 		if (key.equals(" "))
 			key = "_";
 		//return key + ", " + time  + "," + second + "," + xPos + "," + yPos;
-		return  "       "+ key + "         " + time  + "         " + second + "        " + xPos + "        " + yPos;
+		return  "       "+ key + "         " + time  + "         " + second + "        " + xPos + "        " + yPos + "         " + dwellTime;
 	}
 
 	private long time;
@@ -31,5 +39,7 @@ public class Sample {
 	private float second;
 	private int xPos;
 	private int yPos;
+	
+	private int dwellTime;
 
 }

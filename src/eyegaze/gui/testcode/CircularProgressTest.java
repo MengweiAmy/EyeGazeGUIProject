@@ -16,7 +16,7 @@ public class CircularProgressTest {
 	public JComponent makeUI(String dwellTime) {
 	    JProgressBar progress = new JProgressBar();
 	    // use JProgressBar#setUI(...) method
-	    progress.setUI(new ProgressCircleUI());
+	    progress.setUI(new ProgressCircleUI(false));
 	    progress.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 	    progress.setStringPainted(true);
 	    progress.setFont(progress.getFont().deriveFont(24f));

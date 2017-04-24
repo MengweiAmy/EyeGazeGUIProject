@@ -141,11 +141,11 @@ public class FixationModel {
 	public boolean isSameFixation(int xPos, int yPos) {
 		boolean isXSameFix = false;
 		boolean isYSameFix = false;
-		if(xPos > xPosition-offset && xPos < xPosition + offset) {
+		if(xPos >= xPosition-offset && xPos <= xPosition + offset) {
 			isXSameFix = true;
 		}
 		
-		if(yPos > yPosition-offset && yPos < yPosition + offset) {
+		if(yPos >= yPosition-offset && yPos <= yPosition + offset) {
 			isYSameFix = true;
 		}
 		
