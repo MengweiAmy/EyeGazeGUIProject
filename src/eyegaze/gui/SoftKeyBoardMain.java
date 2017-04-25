@@ -52,6 +52,8 @@ import eyegaze.gui.model.Sample;
 import eyegaze.gui.service.AnalysisGazeLog;
 import eyegaze.gui.service.MouseControlService;
 import eyegaze.gui.service.WriteClickLog;
+import eyegaze.gui.service.WriteFinalGazeLog;
+import eyegaze.jni.EyeGazeData;
 import eyegaze.jni.EyeGazeRetrieveData;
 
 /**
@@ -242,13 +244,16 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 
 					// Start analysis fixation data when close the application
 					// window
+					List<EyeGazeData> data = AnalysisGazeLog.getInstance().getEyeGazeData();
 					if (controlType == "Mouse Control") {
 						MouseControlService service = new MouseControlService();
-						service.verifyFixtionData(AnalysisGazeLog.getInstance().getEyeGazeData());
+						service.verifyFixtionData(data);
 					} else if (controlType.equals("Gaze Control")) {
 						// Write fixation data into log file
 						EyeGazeRetrieveData.writeFixationDataLog();
 					}
+					//Write a new log for analysis with pure pupil size and dwelltime etc.
+					WriteFinalGazeLog.getInstance().CfgWriter(data, "fixation_block.dat");
 					System.exit(0);
 				} else {
 					System.out.println("DO NOT close the window");
@@ -374,9 +379,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 				new KeyBt("X", (2 * w / 3) + 1 * w, 2 * h, w, h), new KeyBt("C", (2 * w / 3) + 2 * w, 2 * h, w, h),
 				new KeyBt("V", (2 * w / 3) + 3 * w, 2 * h, w, h), new KeyBt("B", (2 * w / 3) + 4 * w, 2 * h, w, h),
 				new KeyBt("N", (2 * w / 3) + 5 * w, 2 * h, w, h), new KeyBt("M", (2 * w / 3) + 6 * w, 2 * h, w, h),
-				new KeyBt("Space", 2 * w, 3 * h, 7 * w, h), new KeyBt("Enter", (w / 3) + 9 * w, 1 * h, 2 * w, h),
-				new KeyBt("Bksp", 10 * w, 0, 2 * w, h), new KeyBt("Setting", 0 * w, 4 * h, 12 * w, h),
-				new KeyBt("Shift", (2 * w / 3) + 7 * w, 2 * h, 4 * w, h), };
+				new KeyBt("Space", 1 * w, 3 * h, 7 * w, h), new KeyBt("Enter", (2 * w / 3) + 7 * w, 2 * h, 4 * w + (w / 3), h),
+				new KeyBt("Bksp", 10 * w, 0, 2 * w, h), new KeyBt("Setting", 0 * w, 4 * h, 12 * w , h),
+				new KeyBt("Shift", 8 * w, 3 * h, 4 * w, h), };
 
 		keyboardLayerPanel = new Keyboard(qwertyKeyboard, this, controlType);
 		keyboardSet = qwertyKeyboard;
@@ -649,11 +654,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		samples = new Vector<Sample>();
 
 		if (finishCount == sentenceSize) {
-
 			// if it is the end of the block , stop the data collection thread
 			stopGazeControl();
 
-			JLabel thankyou = new JLabel("End of This Session. Thank you.");
+			JLabel thankyou = new JLabel("End of This block. Thank you.");
 			thankyou.setFont(new Font("sansserif", Font.PLAIN, 16));
 			JOptionPane.showMessageDialog(this, thankyou);
 		} else {

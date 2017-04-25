@@ -56,9 +56,9 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private String[] offsetList = {"30","50","65","75","100"};
 	
-	private String[] dwellList = {"50ms", "100ms","150ms","200ms","250ms","300ms","350ms","400ms","500ms"};
+	private String[] dwellList = {"150ms","300ms","600ms"};
 	
-	private String[] sentenCeList = {"1","3","5","10","15"};
+	private String[] sentenCeList = {"5","10","15"};
 	
 	private String[] dwellTimeType = {"consistent","random"};
 	

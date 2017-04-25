@@ -43,5 +43,4 @@ public class WriteClickLog {
 			System.out.println("Problem!: " + e);
 		}
 	}
-
 }
