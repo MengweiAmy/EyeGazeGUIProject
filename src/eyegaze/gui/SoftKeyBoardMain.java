@@ -177,15 +177,15 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		 * debugging
 		 */
 
-		 //EyeDeviceControl.getInstance().initializeDevice();
-		 //isDeviceStarted = true;
+		EyeDeviceControl.getInstance().initializeDevice();
+		isDeviceStarted = true;
 
 		JFrame frame = this;
 		frame.setTitle("Current Control Type:" + controlType);
 		p1 = createTextField();
 
-		//System.out.println("dwellTime is changed" + dwellTime);
-		//System.out.println("blockNo is changed" + blockNo);
+		System.out.println("dwellTime is changed" + dwellTime);
+		System.out.println("blockNo is changed" + blockNo);
 
 		/*
 		 * Add glass pane on keyboard panel to avoid mouse click events
@@ -269,6 +269,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		 */
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		if (controlType == "Gaze Control" && isDeviceStarted) {
+			// 
 			initilizeTimerForEachButton();
 			startGazeControl();
 		}
@@ -381,7 +382,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 				new KeyBt("N", (2 * w / 3) + 5 * w, 2 * h, w, h), new KeyBt("M", (2 * w / 3) + 6 * w, 2 * h, w, h),
 				new KeyBt("Space", 1 * w, 3 * h, 7 * w, h), new KeyBt("Enter", (2 * w / 3) + 7 * w, 2 * h, 4 * w + (w / 3), h),
 				new KeyBt("Bksp", 10 * w, 0, 2 * w, h), new KeyBt("Setting", 0 * w, 4 * h, 12 * w , h),
-				new KeyBt("Shift", 8 * w, 3 * h, 4 * w, h), };
+				new KeyBt("Shift", 8 * w, 3 * h, 3 * w, h), };
 
 		keyboardLayerPanel = new Keyboard(qwertyKeyboard, this, controlType);
 		keyboardSet = qwertyKeyboard;
@@ -419,8 +420,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		}
 
 		// present first phrase for input
-		// presentedPhrase = phrases[r.nextInt(phrases.length)];
-		presentedPhrase = phrases[Integer.valueOf(blockNo) * sentenceSize];
+		presentedPhrase = phrases[r.nextInt(phrases.length)];
+		//presentedPhrase = phrases[Integer.valueOf(blockNo) * sentenceSize];
 	}
 
 	public void showResultDialog() {
@@ -495,7 +496,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 	 * button
 	 */
 	public void stopProgressBarTimer() {
-		timer.stop();
+		if (timer != null) {
+			timer.stop();
+			System.out.println("current time is stopped");
+		}
 	}
 
 	/**
@@ -663,7 +667,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		} else {
 			// Increase the phrase every time click the enter
 			int cout = Integer.valueOf(blockNo);
-			presentedPhrase = phrases[cout + finishCount];
+			presentedPhrase = phrases[r.nextInt(phrases.length)];
 
 			text1.setText(presentedPhrase);
 			targetPhrase = "";

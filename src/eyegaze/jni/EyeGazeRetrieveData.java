@@ -77,15 +77,6 @@ public class EyeGazeRetrieveData {
 					// list
 					FixationModel nextMo = convertEyeGazeDataToFixation(data);
 					fixationList.add(nextMo);
-//					if(fixationList.size() > 6) {
-//						SoftKeyBoardMain.getInstance().addFocusCircle(pupilXPos, pupilXPos);
-//						System.out.println("Added circle at position: pupilXPos......."+pupilXPos +"," +pupilYPos);
-//					}
-					// System.out.println("fixationList "+fixationList.size());
-					// System.out.println("miniFixationSize/3
-					// "+miniFixationSize/3);
-					// if the current list size is larger than 6, then marked as
-					// one fixation
 					if (fixationList.size() >= miniFixationSize / 3) {
 						// If it is the first time to reach 6 gaze points,
 						// notify the application,
@@ -118,8 +109,7 @@ public class EyeGazeRetrieveData {
 						// And prepare to write into the dat file
 					}
 				} else {
-					// System.out.println("not the same fixation model.......");
-					SoftKeyBoardMain.getInstance().stopProgressBarTimer();
+					System.out.println("not the same fixation model.......");
 					/*
 					 * Empty the previous list and create a new possible
 					 * fixation point
@@ -128,13 +118,11 @@ public class EyeGazeRetrieveData {
 					fixationList = new ArrayList<FixationModel>();
 					fixationList.add(model);
 					isNotified = false;
+					
+					SoftKeyBoardMain.getInstance().stopProgressBarTimer();
 				}
 			}
-			// System.out.println("Detecting one fixation data: Current fixation
-			// Index :" + currentIndex);
-		} else {
-			// System.out.println("DID NOT receive data");
-		}
+		} 
 	}
 
 	/*

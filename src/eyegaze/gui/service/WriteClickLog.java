@@ -26,7 +26,7 @@ public class WriteClickLog {
 	// Write the click button info into the dat file
 	public void CfgWriter(String target, String present, Vector<Sample> samples, String FileToWriteTo) {
 		try {
-			CfgWrite = new BufferedWriter(new FileWriter(FileToWriteTo, true));
+			CfgWrite = new BufferedWriter(new FileWriter(FileToWriteTo, false));
 			
 			CfgWrite.write("Presented Phrase: " + present);
 			CfgWrite.newLine();

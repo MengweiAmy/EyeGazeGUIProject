@@ -28,14 +28,18 @@ public class WriteFinalGazeLog {
 	public void CfgWriter(List<EyeGazeData> data, String FileToWriteTo) {
 		Configuration config = ConfigurationService.getInstance().loadConfig();
 		try {
-			CfgWrite = new BufferedWriter(new FileWriter(FileToWriteTo, true));
+			CfgWrite = new BufferedWriter(new FileWriter(FileToWriteTo, false));
 			CfgWrite.newLine();
-			CfgWrite.write("Index    blockNo     dwellTime     ControlType      PupilSize");
+			CfgWrite.write("Index   blockNo    dwellTime   ControlType    PupilSize");
 			CfgWrite.newLine();
-			for (int i = 0; i < data.size(); i++) {
-				CfgWrite.write(i+"   " + "     "  + config.getDwellTime() + config.getControlType() + "     " 
-			+ data.get(i).getPupilRadiusMm() + "    ");
-				CfgWrite.newLine();
+			if(data != null && data.size() > 0) {
+				for (int i = 0; i < data.size(); i++) {
+					String a = i+"   " + 0 + "    "  + config.getDwellTime() + "   " + config.getControlType() + "   " 
+							+ data.get(i).getPupilRadiusMm() * 2 + "    ";
+					CfgWrite.write(i+"         " + 0 + "          "  + config.getDwellTime() + "           " + config.getControlType() + "         " 
+				+ data.get(i).getPupilRadiusMm() * 2 + "     ");
+					CfgWrite.newLine();
+				}
 			}
 			CfgWrite.close();
 		} catch (IOException e) {
