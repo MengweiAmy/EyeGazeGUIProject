@@ -18,6 +18,11 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -137,6 +142,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 	private int blockNo;
 
 	private boolean isActiveSetting = false;
+	
+	private String logFolder;
 
 	/************************************
 	 * Device Parameters
@@ -170,6 +177,14 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 	}
 
 	public void createAndShowGUI() {
+		//Get log folder
+		String type = "";
+		if(controlType.equals("Mouse Control")) {
+			type = "Mouse";
+		}else {
+			type = "Gaze";
+		}
+		logFolder = System.getProperty("user.dir") + "//Data//"+type+"//"+dwellTime+"//Block"+blockNo;
 
 		// Start initial device and calibrate process
 
@@ -186,7 +201,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		p1 = createTextField();
 
 		System.out.println("dwellTime is changed" + dwellTime);
-		System.out.println("blockNo is changed" + blockNo);
 
 		/*
 		 * Add glass pane on keyboard panel to avoid mouse click events
@@ -246,7 +260,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 					// Start analysis fixation data when close the application
 					// window
 					List<EyeGazeData> data = AnalysisGazeLog.getInstance().getEyeGazeData();
-					if (controlType == "Mouse Control") {
+					if (controlType.equals("Mouse Control")) {
 						MouseControlService service = new MouseControlService();
 						service.verifyFixtionData(data);
 					} else if (controlType.equals("Gaze Control")) {
@@ -255,7 +269,10 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 					}
 					//Write a new log for analysis with pure pupil size and dwelltime etc.
 					WriteFinalGazeLog.getInstance().CfgWriter(data, "fixation_block.dat");
+					
+					MoveFixationLogFiles();
 					System.exit(0);
+				
 				} else {
 					System.out.println("DO NOT close the window");
 				}
@@ -664,7 +681,8 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		Calendar cal = Calendar.getInstance();
 		SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy");
 		// s1 = sdf.format(cal.getTime())+"-"+controlType+".dat";
-		String si = "ClickInfo" + "_" + finishCount + sdf.format(cal.getTime()) + ".dat";
+
+		String si = logFolder+"//ClickInfo" + "_" + finishCount + sdf.format(cal.getTime()) + ".dat";
 
 		WriteClickLog.getInstance().CfgWriter(targetPhrase, presentedPhrase, samples, si);
 
@@ -691,6 +709,41 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		}
 
 		showResultDialog();
+	}
+	
+	/*
+	 * Move the log file into existed data folder
+	 */
+	private void MoveFixationLogFiles(){
+		String curr = System.getProperty("user.dir");
+		
+		//Copying fixation.dat data
+		String fix = curr + "//fixation.dat";
+		Path source = FileSystems.getDefault().getPath(fix);
+		Path target = FileSystems.getDefault().getPath(logFolder+"//fixation.dat");
+		
+		//Copying fixation_block.dat data
+		String fixBlock = curr + "//fixation_block.dat";
+		Path blockSource = FileSystems.getDefault().getPath(fixBlock);
+		Path targetblock = FileSystems.getDefault().getPath(logFolder+"//fixation_block.dat");
+		
+		//Copying fixation.dat data
+		String fixIndex = curr + "//fixtionIndex.dat";
+		Path IndexSource = FileSystems.getDefault().getPath(fixIndex);
+		Path targetIndex = FileSystems.getDefault().getPath(logFolder+"//fixtionIndex.dat");
+		try {
+			Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+			System.out.println("fixation_block.dat file is copied to the data folder.");
+			
+			Files.copy(blockSource, targetblock, StandardCopyOption.REPLACE_EXISTING);
+			System.out.println("fixation.dat file is copied to the data folder.");
+			
+			Files.copy(IndexSource, targetIndex, StandardCopyOption.REPLACE_EXISTING);
+			System.out.println("fixationIndex.dat file is copied to the data folder.");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	// compute typing speed in wpm given text entered and time in ms
@@ -741,4 +794,6 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 	public void setIsLongsentence(int longSent) {
 		this.isLongsentence = longSent;
 	}
+	
+	
 }

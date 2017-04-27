@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -64,9 +65,11 @@ public class SettingDialog extends JFrame implements ActionListener{
 	
 	private String[] sentenType= {"Long Sentence","Short Sentence"};
 	
+	private String[] blockNo = {"1","2","3","4","5"};
+	
     
     String[] labels = {"Select Control Type:", "Select Minimum fixation samples:", "Select Minimum fixation offset:", "Select dwell time(millSec):"
-   		 ,"Select Phrases block", "Select sentence size:", "Dwell Time Type:", "Sentence Type:"};
+   		 ,"Select Phrases block", "Select sentence block:", "Dwell Time Type:", "Sentence Type:"};
     
     String[] types = { "Mouse Control", "Gaze Control"};
     
@@ -74,10 +77,15 @@ public class SettingDialog extends JFrame implements ActionListener{
     int offsetIndex=0;   
     int dwellIndex=0;
     int controlIndex = 0;
-    int phraseIndex = 0;
+    int blockIndex = 0;
     int sentTypeIndex = 0;
     
-    int phraseSize = 100;
+    /**
+     * Parameters for making folder
+     */
+    int dwellTime = 0;
+    int blockNumber = 0;
+    
 
 	/**
 	 * 
@@ -128,12 +136,8 @@ public class SettingDialog extends JFrame implements ActionListener{
 	        	 l.setLabelFor(dwellCombo);
 		         p.add(dwellCombo);
 	         }else if(i==4) {
-	        	 currTypes = new String[phraseSize];
-	        	 for(int j=0; j< phraseSize; j++) {
-	        		 currTypes[j] = ""+j;
-	        	 }
-	        	 phraseBlockCombo = new JComboBox(currTypes);
-	        	 phraseBlockCombo.setSelectedIndex(phraseIndex);
+	        	 phraseBlockCombo = new JComboBox(blockNo);
+	        	 phraseBlockCombo.setSelectedIndex(blockIndex);
 	        	 l.setLabelFor(phraseBlockCombo);
 		         p.add(phraseBlockCombo);
 	         }else if(i==5) {
@@ -192,13 +196,15 @@ public class SettingDialog extends JFrame implements ActionListener{
 			        cfg.setControlType(controlTypeCombo.getSelectedIndex());
 			        System.out.println("settings"+controlTye);
 			        
-			        String dwellTime = (String) dwellCombo.getSelectedItem();
-			        String time = dwellTime.substring(0, dwellTime.length()-2);
+			        String dwtime = (String) dwellCombo.getSelectedItem();
+			        String time = dwtime.substring(0, dwtime.length()-2);
+			        dwellTime = Integer.valueOf(time);
 			        cfg.setDwellTime(Integer.valueOf(time));
 			        System.out.println("time:"+time);
 			        
 			        String blockNo = (String) phraseBlockCombo.getSelectedItem();
 			        cfg.setBlockRef(Integer.valueOf(blockNo));
+			        blockNumber = Integer.valueOf(blockNo);
 			        
 			        String sentenSiz = (String)sentenSizeCombo.getSelectedItem();
 			        cfg.setBlockSize(Integer.valueOf(sentenSiz));
@@ -229,6 +235,8 @@ public class SettingDialog extends JFrame implements ActionListener{
 			            	}
 			            	dispose();//close current setting window and open a new keyboard one
 			            	
+			            	// Create folder first
+			            	createAndCheckFolder();
 			            	/*
 			            	 * Set controlType before start the application
 			            	 */
@@ -306,12 +314,30 @@ public class SettingDialog extends JFrame implements ActionListener{
 					break;
 				}
 			}
-			
-			phraseIndex = cfe.getBlockRef();
+			//5 is the last block no. if last 
+			if(cfe.getBlockRef() < 5) {
+				blockIndex = cfe.getBlockRef();
+			}else {
+				blockIndex = 0;
+			}
 			controlIndex = cfe.getControlType();
 			sentTypeIndex = cfe.getSentenceType();
 			
 		}
+	}
+	
+	private void createAndCheckFolder() {
+		String currPath = System.getProperty("user.dir");
+		
+		//Make gaze folder
+		String dataGaFolder = currPath + "//Data//Gaze//" + dwellTime + "//Block" + blockNumber;
+		File fileGa = new File(dataGaFolder);
+		fileGa.mkdirs();
+		
+		//Make Mouse folder
+		String dataMousFolder = currPath + "//Data//Mouse//" + dwellTime + "//Block" + blockNumber;
+		File fileMouse = new File(dataMousFolder);
+		fileMouse.mkdirs();
 	}
 
 	@Override
