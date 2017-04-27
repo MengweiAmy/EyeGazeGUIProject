@@ -53,6 +53,7 @@ import eyegaze.gui.service.AnalysisGazeLog;
 import eyegaze.gui.service.MouseControlService;
 import eyegaze.gui.service.WriteClickLog;
 import eyegaze.gui.service.WriteFinalGazeLog;
+import eyegaze.gui.testcode.WavPlayer;
 import eyegaze.jni.EyeGazeData;
 import eyegaze.jni.EyeGazeRetrieveData;
 
@@ -528,6 +529,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 						//		+ System.currentTimeMillis());
 						if (!hasPerformClick) {
 							jbtn.doClick();
+							//WavPlayer.getInstance().play();
 							clickedKeys.add(jbtn.getText() + " ");
 							//System.out.println("Calling doclick function by" + jbtnList[currentIndex].getText());
 							hasPerformClick = true;
@@ -544,6 +546,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent action) {
 		// TODO Auto-generated method stub
+		
+		//Play the notify sounds when the button is clicked
+		WavPlayer.getInstance().play();
 		if (!isLogstared && isDeviceStarted) {
 			EyeDeviceControl.getInstance().startLogging();
 			EyeDeviceControl.getInstance().displayEyeImages();
@@ -553,7 +558,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		JButton jb = (JButton) action.getSource();
 		String s = jb.getText();
 		char c = s.charAt(0);
-		if (isShiftPress) {
+		if (isShiftPress && !s.equals("Enter") &&
+				!s.equals("Shift") && !s.equals("Setting")
+				&& !s.equals("Bksp")) {
 			s = s.toUpperCase();
 			isShiftPress = false;
 		} else {
@@ -581,6 +588,9 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		newSam.setYPos(y);
 		newSam.setDwellTime(dwellTime);
 		samples.addElement(newSam);
+		
+		Thread tr = new Thread();
+		WavPlayer.getInstance().stop();
 
 		if (s.equals("Enter")) {
 			enterPressed();
@@ -591,13 +601,17 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 				text2.requestFocus(); // so I-beam (caret) does not disappear
 			}
 		} else if (s.equals("Setting")) {
-			// TODO
+			// TODO Comment the setting button
 			if (isActiveSetting) {
-				activeSettingDialog();
+				//activeSettingDialog();
 			}
 		} else if (s.equals("Shift")) {
 			// TODO
-			isShiftPress = true;
+			if(isShiftPress) {
+				isShiftPress = false;
+			}else {
+				isShiftPress = true;
+			}
 		} else
 		// just a keystroke; add to transcribed text
 		{
