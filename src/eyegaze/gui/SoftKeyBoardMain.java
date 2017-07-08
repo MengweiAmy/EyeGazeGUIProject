@@ -565,7 +565,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		// TODO Auto-generated method stub
 		
 		//Play the notify sounds when the button is clicked
-		WavPlayer.getInstance().play();
+		
 		if (!isLogstared && isDeviceStarted) {
 			EyeDeviceControl.getInstance().startLogging();
 			EyeDeviceControl.getInstance().displayEyeImages();
@@ -606,8 +606,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		newSam.setDwellTime(dwellTime);
 		samples.addElement(newSam);
 		
-		Thread tr = new Thread();
-		WavPlayer.getInstance().stop();
+		(new Thread(new ClickSounds())).start();
 
 		if (s.equals("Enter")) {
 			enterPressed();
@@ -682,7 +681,7 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 		SimpleDateFormat sdf = new SimpleDateFormat("HHmmss-ddMM-yyyy");
 		// s1 = sdf.format(cal.getTime())+"-"+controlType+".dat";
 
-		String si = logFolder+"//ClickInfo" + "_" + finishCount + sdf.format(cal.getTime()) + ".dat";
+		String si = logFolder+"//ClickInfo" + "_" + finishCount+ ".dat";
 
 		WriteClickLog.getInstance().CfgWriter(targetPhrase, presentedPhrase, samples, si);
 
@@ -744,6 +743,17 @@ public class SoftKeyBoardMain extends JFrame implements ActionListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public class ClickSounds implements Runnable {
+
+	    public void run() {
+	    	WavPlayer.getInstance().play();
+	    }
+	    
+	    public void stop() {
+	    	WavPlayer.getInstance().stop();
+	    }
 	}
 
 	// compute typing speed in wpm given text entered and time in ms
